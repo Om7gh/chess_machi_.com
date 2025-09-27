@@ -1,179 +1,21 @@
-/* styles.css */
 @import 'tailwindcss';
 
 * {
   user-select: none;
 }
 
-.board {
-  display: grid;
-  grid-template-columns: calc(0.25 * 5vmax);
+.App {
+  background-image: url(assets/bg1.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100vh;
 }
 
-.tile {
+#board {
+  width: 40vmax;
+  height: 40vmax;
   display: grid;
   grid-template-columns: repeat(8, 5vmax);
   grid-template-rows: repeat(8, 5vmax);
-  width: calc(8 * 5vmax);
-}
-
-.piece {
-  width: 12.5%;
-  height: 12.5%;
-  position: absolute;
-  background-size: 100%;
-}
-
-.piece.br {
-  background-image: url('./assets/piece/rhosgfx/bR.svg');
-}
-.piece.bk {
-  background-image: url('./assets/piece/rhosgfx/bK.svg');
-}
-.piece.bq {
-  background-image: url('./assets/piece/rhosgfx/bQ.svg');
-}
-.piece.bb {
-  background-image: url('./assets/piece/rhosgfx/bB.svg');
-}
-.piece.bp {
-  background-image: url('./assets/piece/rhosgfx/bP.svg');
-}
-.piece.bn {
-  background-image: url('./assets/piece/rhosgfx/bN.svg');
-}
-
-.piece.wr {
-  background-image: url('./assets/piece/rhosgfx/wR.svg');
-}
-.piece.wk {
-  background-image: url('./assets/piece/rhosgfx/wK.svg');
-}
-.piece.wq {
-  background-image: url('./assets/piece/rhosgfx/wQ.svg');
-}
-.piece.wp {
-  background-image: url('./assets/piece/rhosgfx/wP.svg');
-}
-.piece.wb {
-  background-image: url('./assets/piece/rhosgfx/wB.svg');
-}
-.piece.wn {
-  background-image: url('./assets/piece/rhosgfx/wN.svg');
-}
-
-.file {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  height: calc(0.25 * 5vmax);
-  grid-column: 2;
-}
-
-.pieces {
-  position: absolute;
-  top: 0;
-  left: calc(0.25 * 5vmax);
-  bottom: calc(0.25 * 5vmax);
-  right: 0;
-}
-
-.p-00 {
-  transform: translate(0%, 0);
-}
-.p-01 {
-  transform: translate(100%, 0);
-}
-.p-02 {
-  transform: translate(200%, 0);
-}
-.p-03 {
-  transform: translate(300%, 0);
-}
-.p-04 {
-  transform: translate(400%, 0);
-}
-.p-05 {
-  transform: translate(500%, 0);
-}
-.p-06 {
-  transform: translate(600%, 0);
-}
-.p-07 {
-  transform: translate(700%, 0);
-}
-
-.p-70 {
-  transform: translate(0%, 700%);
-}
-.p-71 {
-  transform: translate(100%, 700%);
-}
-.p-72 {
-  transform: translate(200%, 700%);
-}
-.p-73 {
-  transform: translate(300%, 700%);
-}
-.p-74 {
-  transform: translate(400%, 700%);
-}
-.p-75 {
-  transform: translate(500%, 700%);
-}
-.p-76 {
-  transform: translate(600%, 700%);
-}
-.p-77 {
-  transform: translate(700%, 700%);
-}
-
-.p-60 {
-  transform: translate(700%, 600%);
-}
-.p-61 {
-  transform: translate(600%, 600%);
-}
-.p-62 {
-  transform: translate(500%, 600%);
-}
-.p-63 {
-  transform: translate(400%, 600%);
-}
-.p-64 {
-  transform: translate(300%, 600%);
-}
-.p-65 {
-  transform: translate(200%, 600%);
-}
-.p-66 {
-  transform: translate(100%, 600%);
-}
-.p-67 {
-  transform: translate(0%, 600%);
-}
-
-.p-10 {
-  transform: translate(700%, 100%);
-}
-.p-11 {
-  transform: translate(600%, 100%);
-}
-.p-12 {
-  transform: translate(500%, 100%);
-}
-.p-13 {
-  transform: translate(400%, 100%);
-}
-.p-14 {
-  transform: translate(300%, 100%);
-}
-.p-15 {
-  transform: translate(200%, 100%);
-}
-.p-16 {
-  transform: translate(100%, 100%);
-}
-.p-17 {
-  transform: translate(0%, 100%);
+  position: relative;
 }

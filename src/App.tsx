@@ -1,11 +1,11 @@
-import Board from "./components/Board/Board";
-import bg from "./assets/bg.jpg";
+import Board from './components/Board';
 
 export default function App() {
   return (
-    <div className="grid place-items-center h-screen text-slate-100 bg-slate-900/90 relative">
-      <img src={bg} alt="background" className="w-full h-full absolute -z-1" />
-      <Board />
+    <div className="App">
+      <div className="bg-slate-950/80 h-screen backdrop-blur-2xl text-slate-100 grid place-content-center">
+        <Board />
+      </div>
     </div>
   );
 }
