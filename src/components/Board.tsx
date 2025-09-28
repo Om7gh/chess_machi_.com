@@ -4,6 +4,8 @@ import { HORIZONTAL_AXIS, VERTICAL_AXIS } from '../utils';
 import Tile from './Tile';
 import { initBoard } from '../utils/initBoard';
 import { ChessRules } from '../chessRules';
+import Files from './Files';
+import Ranks from './Ranks';
 
 export default function Board() {
     const boardRef = useRef<HTMLDivElement | null>(null);
@@ -24,8 +26,8 @@ export default function Board() {
 
         if (target.classList.contains('piece') && rect) {
             const tileSize = rect.width / 8;
-            const x = Math.floor((e.clientX - rect.left) / tileSize);
-            const y = Math.floor((e.clientY - rect.top) / tileSize);
+            const x = 7 - Math.floor((e.clientY - rect.top) / tileSize);
+            const y = Math.floor((e.clientX - rect.left) / tileSize);
 
             setDraggablePiece(target);
             setActivePieceCoords({ x, y });
@@ -36,8 +38,9 @@ export default function Board() {
             target.style.pointerEvents = 'none';
             target.style.zIndex = '1000';
 
-            const boardX = e.clientX - rect.left - target.offsetWidth / 2;
-            const boardY = e.clientY - rect.top - target.offsetHeight / 2;
+            const boardX = e.clientX - rect.left - target.offsetHeight / 2;
+            const boardY = e.clientY - rect.top - target.offsetWidth / 2;
+
             target.style.left = `${boardX}px`;
             target.style.top = `${boardY}px`;
         }
@@ -58,17 +61,31 @@ export default function Board() {
         const rect = boardRef.current?.getBoundingClientRect();
         if (draggablePiece && rect && activePieceCoords) {
             const tileSize = rect.width / 8;
-            const newX = Math.floor((e.clientX - rect.left) / tileSize);
-            const newY = Math.floor((e.clientY - rect.top) / tileSize);
-            const isValidMove = rules.isValid();
+
+            const newX = 7 - Math.floor((e.clientY - rect.top) / tileSize);
+            const newY = Math.floor((e.clientX - rect.left) / tileSize);
             setPieces((prevPieces) =>
-                prevPieces.map((p) =>
-                    p.x === activePieceCoords.x &&
-                    p.y === activePieceCoords.y &&
-                    isValidMove
-                        ? { ...p, x: newX, y: newY }
-                        : p
-                )
+                prevPieces.map((p) => {
+                    if (
+                        p.x === activePieceCoords.x &&
+                        p.y === activePieceCoords.y
+                    ) {
+                        if (
+                            rules.isValid(
+                                activePieceCoords.x,
+                                activePieceCoords.y,
+                                newX,
+                                newY,
+                                p.team,
+                                p.type,
+                                prevPieces
+                            )
+                        ) {
+                            return { ...p, x: newX, y: newY };
+                        }
+                    }
+                    return p;
+                })
             );
 
             draggablePiece.style.position = '';
@@ -84,8 +101,8 @@ export default function Board() {
         }
     };
 
-    for (let y = 0; y < VERTICAL_AXIS.length; y++) {
-        for (let x = 0; x < HORIZONTAL_AXIS.length; x++) {
+    for (let x = VERTICAL_AXIS.length - 1; x >= 0; x--) {
+        for (let y = 0; y < HORIZONTAL_AXIS.length; y++) {
             let image = undefined;
             pieces.forEach((p) => {
                 if (p.x === x && p.y === y) {
@@ -107,7 +124,9 @@ export default function Board() {
             onMouseUp={dropPiece}
             style={{ position: 'relative' }}
         >
+            <Files />
             {board}
+            <Ranks />
         </div>
     );
 }

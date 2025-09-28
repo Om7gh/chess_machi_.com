@@ -28,9 +28,12 @@ export default function Tile({
         >
             {piece && (
                 <div
-                    className="w-4/5 h-4/5 bg-contain bg-center bg-no-repeat cursor-grab piece"
+                    className="w-4/5 h-4/5 bg-contain bg-center bg-no-repeat cursor-grab piece text-xs"
                     style={{ backgroundImage: `url('${piece}')` }}
-                />
+                >
+                    {HORIZONTAL_AXIS[rank]}
+                    {VERTICAL_AXIS[file]}
+                </div>
             )}
         </div>
     );
