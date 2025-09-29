@@ -6,4 +6,5 @@ export interface Pieces {
     y: number;
     team: Teams;
     type: PieceType;
+    isEmpassant?: boolean | undefined;
 }

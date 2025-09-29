@@ -64,30 +64,103 @@ export default function Board() {
 
             const newX = 7 - Math.floor((e.clientY - rect.top) / tileSize);
             const newY = Math.floor((e.clientX - rect.left) / tileSize);
-            setPieces((prevPieces) =>
-                prevPieces.map((p) => {
-                    if (
-                        p.x === activePieceCoords.x &&
-                        p.y === activePieceCoords.y
-                    ) {
-                        if (
-                            rules.isValid(
-                                activePieceCoords.x,
-                                activePieceCoords.y,
-                                newX,
-                                newY,
-                                p.team,
-                                p.type,
-                                prevPieces
-                            )
-                        ) {
-                            return { ...p, x: newX, y: newY };
-                        }
-                    }
-                    return p;
-                })
+
+            const currentPiece = pieces.find(
+                (p) =>
+                    p.x === activePieceCoords.x && p.y === activePieceCoords.y
             );
 
+            if (!currentPiece) {
+                resetDraggablePiece();
+                return;
+            }
+
+            const isEnPassantMove = rules.enPassant(
+                activePieceCoords.x,
+                activePieceCoords.y,
+                newX,
+                newY,
+                currentPiece.team,
+                pieces,
+                currentPiece.type
+            );
+
+            const isValidMove = rules.isValid(
+                activePieceCoords.x,
+                activePieceCoords.y,
+                newX,
+                newY,
+                currentPiece.team,
+                currentPiece.type,
+                pieces
+            );
+
+            if (isValidMove) {
+                setPieces((prevPieces) => {
+                    // First, reset all en passant flags from previous moves
+                    const resetEnPassantPieces = prevPieces.map((p) => ({
+                        ...p,
+                        isEmpassant: false,
+                    }));
+
+                    return resetEnPassantPieces
+                        .map((p) => {
+                            // Move the current piece
+                            if (
+                                p.x === activePieceCoords.x &&
+                                p.y === activePieceCoords.y
+                            ) {
+                                // Set en passant flag only if pawn moved two squares
+                                if (
+                                    Math.abs(activePieceCoords.x - newX) ===
+                                        2 &&
+                                    p.type === 'PAWN'
+                                ) {
+                                    return {
+                                        ...p,
+                                        x: newX,
+                                        y: newY,
+                                        isEmpassant: true,
+                                    };
+                                } else {
+                                    return {
+                                        ...p,
+                                        x: newX,
+                                        y: newY,
+                                        isEmpassant: false,
+                                    };
+                                }
+                            }
+
+                            if (
+                                p.x === newX &&
+                                p.y === newY &&
+                                p.team !== currentPiece.team
+                            ) {
+                                return null;
+                            }
+
+                            if (
+                                isEnPassantMove &&
+                                p.x === activePieceCoords.x &&
+                                p.y === newY &&
+                                p.team !== currentPiece.team
+                            ) {
+                                return null;
+                            }
+
+                            return p;
+                        })
+                        .filter((p): p is Pieces => p !== null);
+                });
+            }
+
+            resetDraggablePiece();
+        }
+    };
+
+    const resetDraggablePiece = () => {
+        if (draggablePiece) {
             draggablePiece.style.position = '';
             draggablePiece.style.width = '';
             draggablePiece.style.height = '';
@@ -95,10 +168,9 @@ export default function Board() {
             draggablePiece.style.zIndex = '';
             draggablePiece.style.left = '';
             draggablePiece.style.top = '';
-
-            setDraggablePiece(null);
-            setActivePieceCoords(null);
         }
+        setDraggablePiece(null);
+        setActivePieceCoords(null);
     };
 
     for (let x = VERTICAL_AXIS.length - 1; x >= 0; x--) {
