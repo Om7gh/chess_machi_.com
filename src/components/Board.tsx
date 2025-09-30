@@ -97,20 +97,16 @@ export default function Board() {
 
             if (isValidMove) {
                 setPieces((prevPieces) => {
-                    // First, reset all en passant flags from previous moves
                     const resetEnPassantPieces = prevPieces.map((p) => ({
                         ...p,
                         isEmpassant: false,
                     }));
-
                     return resetEnPassantPieces
                         .map((p) => {
-                            // Move the current piece
                             if (
                                 p.x === activePieceCoords.x &&
                                 p.y === activePieceCoords.y
                             ) {
-                                // Set en passant flag only if pawn moved two squares
                                 if (
                                     Math.abs(activePieceCoords.x - newX) ===
                                         2 &&
@@ -151,7 +147,7 @@ export default function Board() {
 
                             return p;
                         })
-                        .filter((p): p is Pieces => p !== null);
+                        .filter((p) => !!p) as Pieces[];
                 });
             }
 

@@ -7,6 +7,19 @@ export class ChessRules {
         return piece === undefined;
     }
 
+    isCellOccupiedByMe(
+        posX: number,
+        posY: number,
+        board: Pieces[],
+        team: Teams
+    ) {
+        const piece = board.find((p) => p.x === posX && p.y === posY);
+        if (piece) {
+            if (piece.team === team) return false;
+        }
+        return true;
+    }
+
     isCellOccupiedByOpponent(
         posX: number,
         posY: number,
@@ -44,7 +57,60 @@ export class ChessRules {
                 return targetPawn !== undefined;
             }
         }
+        return false;
+    }
 
+    pawnLogic(
+        team: Teams,
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[],
+        type: PieceType
+    ) {
+        const direction = team === 'ME' ? 1 : -1;
+        const startRow = team === 'ME' ? 1 : 6;
+
+        if (newX === prevX + direction && newY === prevY) {
+            return this.isCellAccessible(newX, newY, board);
+        }
+
+        if (
+            prevX === startRow &&
+            newX === prevX + 2 * direction &&
+            newY === prevY
+        ) {
+            const midX = prevX + direction;
+            return (
+                this.isCellAccessible(midX, newY, board) &&
+                this.isCellAccessible(newX, newY, board)
+            );
+        }
+
+        if (newX === prevX + direction && Math.abs(newY - prevY) === 1) {
+            return (
+                this.isCellOccupiedByOpponent(newX, newY, board, team) ||
+                this.enPassant(prevX, prevY, newX, newY, team, board, type)
+            );
+        }
+        return false;
+    }
+
+    knightLogic(
+        team: Teams,
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[]
+    ) {
+        if (Math.abs(newX - prevX) === 2 && Math.abs(newY - prevY) === 1) {
+            return this.isCellOccupiedByMe(newX, newY, board, team);
+        }
+        if (Math.abs(newY - prevY) === 2 && Math.abs(newX - prevX) === 1) {
+            return this.isCellOccupiedByMe(newX, newY, board, team);
+        }
         return false;
     }
 
@@ -58,31 +124,10 @@ export class ChessRules {
         board: Pieces[]
     ): boolean => {
         if (type === 'PAWN') {
-            const direction = team === 'ME' ? 1 : -1;
-            const startRow = team === 'ME' ? 1 : 6;
-
-            if (newX === prevX + direction && newY === prevY) {
-                return this.isCellAccessible(newX, newY, board);
-            }
-
-            if (
-                prevX === startRow &&
-                newX === prevX + 2 * direction &&
-                newY === prevY
-            ) {
-                const midX = prevX + direction;
-                return (
-                    this.isCellAccessible(midX, newY, board) &&
-                    this.isCellAccessible(newX, newY, board)
-                );
-            }
-
-            if (newX === prevX + direction && Math.abs(newY - prevY) === 1) {
-                return (
-                    this.isCellOccupiedByOpponent(newX, newY, board, team) ||
-                    this.enPassant(prevX, prevY, newX, newY, team, board, type)
-                );
-            }
+            return this.pawnLogic(team, prevX, prevY, newX, newY, board, type);
+        }
+        if (type === 'KNIGHT') {
+            return this.knightLogic(team, prevX, prevY, newX, newY, board);
         }
         return false;
     };
