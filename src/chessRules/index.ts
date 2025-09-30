@@ -105,15 +105,84 @@ export class ChessRules {
         newY: number,
         board: Pieces[]
     ) {
-        if (Math.abs(newX - prevX) === 2 && Math.abs(newY - prevY) === 1) {
-            return this.isCellOccupiedByMe(newX, newY, board, team);
-        }
-        if (Math.abs(newY - prevY) === 2 && Math.abs(newX - prevX) === 1) {
+        const deltaX = Math.abs(newX - prevX);
+        const deltaY = Math.abs(newY - prevY);
+
+        if ((deltaX === 2 && deltaY === 1) || (deltaX === 1 && deltaY === 2)) {
             return this.isCellOccupiedByMe(newX, newY, board, team);
         }
         return false;
     }
 
+    bishopLogic(
+        team: Teams,
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[]
+    ) {
+        const deltaX = Math.abs(newX - prevX);
+        const deltaY = Math.abs(newY - prevY);
+
+        if (deltaX !== deltaY) return false;
+
+        const xDirection = newX > prevX ? 1 : -1;
+        const yDirection = newY > prevY ? 1 : -1;
+        for (let i = 1; i < deltaX; i++) {
+            const checkX = prevX + i * xDirection;
+            const checkY = prevY + i * yDirection;
+
+            if (!this.isCellAccessible(checkX, checkY, board)) {
+                return false;
+            }
+        }
+        return this.isCellOccupiedByMe(newX, newY, board, team);
+    }
+
+    rookLogic(
+        team: Teams,
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[]
+    ) {
+        const deltaX = Math.abs(newX - prevX);
+        const deltaY = Math.abs(newY - prevY);
+
+        if (deltaX > 0 && deltaY > 0) {
+            return false;
+        }
+
+        if (deltaX === 0 && deltaY === 0) {
+            return false;
+        }
+
+        if (deltaX > 0) {
+            const xDirection = newX > prevX ? 1 : -1;
+
+            for (let i = 1; i < deltaX; i++) {
+                const checkX = prevX + i * xDirection;
+
+                if (!this.isCellAccessible(checkX, prevY, board)) {
+                    return false;
+                }
+            }
+        } else {
+            const yDirection = newY > prevY ? 1 : -1;
+
+            for (let i = 1; i < deltaY; i++) {
+                const checkY = prevY + i * yDirection;
+
+                if (!this.isCellAccessible(prevX, checkY, board)) {
+                    return false;
+                }
+            }
+        }
+
+        return this.isCellOccupiedByMe(newX, newY, board, team);
+    }
     isValid = (
         prevX: number,
         prevY: number,
@@ -129,6 +198,14 @@ export class ChessRules {
         if (type === 'KNIGHT') {
             return this.knightLogic(team, prevX, prevY, newX, newY, board);
         }
+
+        if (type === 'BISHOP') {
+            return this.bishopLogic(team, prevX, prevY, newX, newY, board);
+        }
+
+        if (type === 'ROCK')
+            return this.rookLogic(team, prevX, prevY, newX, newY, board);
+
         return false;
     };
 }
