@@ -180,9 +180,40 @@ export class ChessRules {
                 }
             }
         }
-
         return this.isCellOccupiedByMe(newX, newY, board, team);
     }
+
+    queenLogic(
+        team: Teams,
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[]
+    ) {
+        return (
+            this.rookLogic(team, prevX, prevY, newX, newY, board) ||
+            this.bishopLogic(team, prevX, prevY, newX, newY, board)
+        );
+    }
+
+    kingLogic(
+        team: Teams,
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[]
+    ) {
+        const deltaX = Math.abs(newX - prevX);
+        const deltaY = Math.abs(newY - prevY);
+        if (deltaX === 1 || deltaY === 1) {
+            if (deltaX + deltaY > 2) return false;
+            return this.isCellOccupiedByMe(newX, newY, board, team);
+        }
+        return false;
+    }
+
     isValid = (
         prevX: number,
         prevY: number,
@@ -192,19 +223,23 @@ export class ChessRules {
         type: PieceType,
         board: Pieces[]
     ): boolean => {
-        if (type === 'PAWN') {
+        if (type === 'PAWN')
             return this.pawnLogic(team, prevX, prevY, newX, newY, board, type);
-        }
-        if (type === 'KNIGHT') {
-            return this.knightLogic(team, prevX, prevY, newX, newY, board);
-        }
 
-        if (type === 'BISHOP') {
+        if (type === 'KNIGHT')
+            return this.knightLogic(team, prevX, prevY, newX, newY, board);
+
+        if (type === 'BISHOP')
             return this.bishopLogic(team, prevX, prevY, newX, newY, board);
-        }
 
         if (type === 'ROCK')
             return this.rookLogic(team, prevX, prevY, newX, newY, board);
+
+        if (type === 'QUEEN')
+            return this.queenLogic(team, prevX, prevY, newX, newY, board);
+
+        if (type === 'KING')
+            return this.kingLogic(team, prevX, prevY, newX, newY, board);
 
         return false;
     };
