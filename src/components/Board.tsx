@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react';
 import type { Pieces } from '../types';
-import { HORIZONTAL_AXIS, VERTICAL_AXIS } from '../utils';
+import { HORIZONTAL_AXIS, Piece, VERTICAL_AXIS } from '../utils';
 import Tile from './Tile';
 import { initBoard } from '../utils/initBoard';
 import { ChessRules } from '../chessRules';
 import Files from './Files';
 import Ranks from './Ranks';
+import type { PieceType } from '../types/enums';
+import PromotionModal from '../utils/PromotionModel';
 
 export default function Board() {
     const boardRef = useRef<HTMLDivElement | null>(null);
@@ -17,7 +19,12 @@ export default function Board() {
         x: number;
         y: number;
     } | null>(null);
-    const board = [];
+    const [promotionPending, setPromotionPending] = useState<{
+        piece: Pieces;
+        newX: number;
+        newY: number;
+    } | null>(null);
+
     const rules = new ChessRules();
 
     const dragPiece = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -55,6 +62,63 @@ export default function Board() {
             draggablePiece.style.left = `${x}px`;
             draggablePiece.style.top = `${y}px`;
         }
+    };
+
+    const handlePromotion = (promotionType: PieceType) => {
+        if (!promotionPending) return;
+
+        const { piece, newX, newY } = promotionPending;
+
+        setPieces((prevPieces) => {
+            const updatedPieces = prevPieces
+                .map((p) => ({
+                    ...p,
+                    isEmpassant: false,
+                }))
+                .filter((p) => {
+                    if (p.x === piece.x && p.y === piece.y) {
+                        return false;
+                    }
+                    if (p.x === newX && p.y === newY && p.team !== piece.team) {
+                        return false;
+                    }
+                    return true;
+                });
+
+            let pieceImage;
+            const pieceType = piece.team === 'ME' ? 0 : 1;
+
+            switch (promotionType) {
+                case 'QUEEN':
+                    pieceImage = pieceType === 0 ? Piece('wQ') : Piece('bQ');
+                    break;
+                case 'ROCK':
+                    pieceImage = pieceType === 0 ? Piece('wR') : Piece('bR');
+                    break;
+                case 'BISHOP':
+                    pieceImage = pieceType === 0 ? Piece('wB') : Piece('bB');
+                    break;
+                case 'KNIGHT':
+                    pieceImage = pieceType === 0 ? Piece('wN') : Piece('bN');
+                    break;
+                default:
+                    console.log('invalid piece');
+            }
+
+            return [
+                ...updatedPieces,
+                {
+                    ...piece,
+                    x: newX,
+                    y: newY,
+                    type: promotionType,
+                    isEmpassant: false,
+                    image: pieceImage,
+                },
+            ];
+        });
+
+        setPromotionPending(null);
     };
 
     const dropPiece = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -96,59 +160,74 @@ export default function Board() {
             );
 
             if (isValidMove) {
-                setPieces((prevPieces) => {
-                    const resetEnPassantPieces = prevPieces.map((p) => ({
-                        ...p,
-                        isEmpassant: false,
-                    }));
-                    return resetEnPassantPieces
-                        .map((p) => {
-                            if (
-                                p.x === activePieceCoords.x &&
-                                p.y === activePieceCoords.y
-                            ) {
+                // Check for pawn promotion
+                const isPromotionMove =
+                    currentPiece.type === 'PAWN' &&
+                    ((currentPiece.team === 'ME' && newX === 7) ||
+                        (currentPiece.team === 'OPPONENT' && newX === 0));
+
+                if (isPromotionMove) {
+                    setPromotionPending({
+                        piece: currentPiece,
+                        newX,
+                        newY,
+                    });
+                } else {
+                    setPieces((prevPieces) => {
+                        const resetEnPassantPieces = prevPieces.map((p) => ({
+                            ...p,
+                            isEmpassant: false,
+                        }));
+
+                        return resetEnPassantPieces
+                            .map((p) => {
                                 if (
-                                    Math.abs(activePieceCoords.x - newX) ===
-                                        2 &&
-                                    p.type === 'PAWN'
+                                    p.x === activePieceCoords.x &&
+                                    p.y === activePieceCoords.y
                                 ) {
-                                    return {
-                                        ...p,
-                                        x: newX,
-                                        y: newY,
-                                        isEmpassant: true,
-                                    };
-                                } else {
-                                    return {
-                                        ...p,
-                                        x: newX,
-                                        y: newY,
-                                        isEmpassant: false,
-                                    };
+                                    if (
+                                        Math.abs(activePieceCoords.x - newX) ===
+                                            2 &&
+                                        p.type === 'PAWN'
+                                    ) {
+                                        return {
+                                            ...p,
+                                            x: newX,
+                                            y: newY,
+                                            isEmpassant: true,
+                                        };
+                                    } else {
+                                        return {
+                                            ...p,
+                                            x: newX,
+                                            y: newY,
+                                            isEmpassant: false,
+                                        };
+                                    }
                                 }
-                            }
 
-                            if (
-                                p.x === newX &&
-                                p.y === newY &&
-                                p.team !== currentPiece.team
-                            ) {
-                                return null;
-                            }
+                                if (
+                                    p.x === newX &&
+                                    p.y === newY &&
+                                    p.team !== currentPiece.team
+                                ) {
+                                    return null;
+                                }
 
-                            if (
-                                isEnPassantMove &&
-                                p.x === activePieceCoords.x &&
-                                p.y === newY &&
-                                p.team !== currentPiece.team
-                            ) {
-                                return null;
-                            }
+                                if (
+                                    isEnPassantMove &&
+                                    p.x === activePieceCoords.x &&
+                                    p.y === newY &&
+                                    p.team !== currentPiece.team
+                                ) {
+                                    return null;
+                                }
 
-                            return p;
-                        })
-                        .filter((p) => !!p) as Pieces[];
-                });
+                                return p;
+                            })
+                            .filter((p) => p !== null);
+                    });
+                }
             }
 
             resetDraggablePiece();
@@ -169,6 +248,7 @@ export default function Board() {
         setActivePieceCoords(null);
     };
 
+    const boardTiles = [];
     for (let x = VERTICAL_AXIS.length - 1; x >= 0; x--) {
         for (let y = 0; y < HORIZONTAL_AXIS.length; y++) {
             let image = undefined;
@@ -177,24 +257,33 @@ export default function Board() {
                     image = p.image;
                 }
             });
-            board.push(
+            boardTiles.push(
                 <Tile piece={image} file={x} rank={y} key={`${x}-${y}`} />
             );
         }
     }
 
     return (
-        <div
-            ref={boardRef}
-            id="board"
-            onMouseDown={dragPiece}
-            onMouseMove={movePiece}
-            onMouseUp={dropPiece}
-            style={{ position: 'relative' }}
-        >
-            <Files />
-            {board}
-            <Ranks />
-        </div>
+        <>
+            <div
+                ref={boardRef}
+                id="board"
+                onMouseDown={dragPiece}
+                onMouseMove={movePiece}
+                onMouseUp={dropPiece}
+                style={{ position: 'relative' }}
+            >
+                <Files />
+                {boardTiles}
+                <Ranks />
+            </div>
+
+            {promotionPending && (
+                <PromotionModal
+                    team={promotionPending.piece.team}
+                    onSelect={handlePromotion}
+                />
+            )}
+        </>
     );
 }

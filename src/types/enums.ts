@@ -12,4 +12,9 @@ enum Teams {
     ME = 'ME',
 }
 
-export { PieceType, Teams };
+enum kingMove {
+    CASTLE = 'CASTLE',
+    REGULAR = 'REGULAR',
+}
+
+export { PieceType, Teams, kingMove };

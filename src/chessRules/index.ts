@@ -1,5 +1,5 @@
 import type { Pieces } from '../types';
-import type { PieceType, Teams } from '../types/enums';
+import { kingMove, type PieceType, type Teams } from '../types/enums';
 
 export class ChessRules {
     isCellAccessible(posX: number, posY: number, board: Pieces[]) {
@@ -180,7 +180,15 @@ export class ChessRules {
                 }
             }
         }
-        return this.isCellOccupiedByMe(newX, newY, board, team);
+
+        if (this.isCellOccupiedByMe(newX, newY, board, team)) {
+            const rock = board.find(
+                (p) => p.x === prevX && p.y === prevY && p.type === 'ROCK'
+            );
+            if (rock) rock.isRookMoving = true;
+            return true;
+        }
+        return false;
     }
 
     queenLogic(
@@ -209,9 +217,50 @@ export class ChessRules {
         const deltaY = Math.abs(newY - prevY);
         if (deltaX === 1 || deltaY === 1) {
             if (deltaX + deltaY > 2) return false;
-            return this.isCellOccupiedByMe(newX, newY, board, team);
+            if (this.isCellOccupiedByMe(newX, newY, board, team)) {
+                const king = board.find(
+                    (p) => p.x === prevX && p.y == prevY && p.type === 'KING'
+                );
+                if (king) king.isKingMoving = true;
+                return true;
+            }
         }
         return false;
+    }
+
+    castleLogic(
+        prevX: number,
+        prevY: number,
+        newX: number,
+        newY: number,
+        board: Pieces[]
+    ) {
+        const kingPiece = board.find(
+            (p) => p.x === prevX && p.y === prevY && p.type === 'KING'
+        ) as Pieces;
+        const rockPiece = board.find(
+            (p) => p.x === newX && p.y === newY && p.type === 'ROCK'
+        ) as Pieces;
+
+        if (rockPiece && kingPiece) {
+            if (kingPiece.team !== rockPiece.team) return false;
+        } else return false;
+
+        const distance = Math.abs(newY - prevY);
+        const yDirection = newY > prevY ? 1 : -1;
+
+        for (let i = 1; i < distance; i++) {
+            const checkY = prevY + i * yDirection;
+            if (!this.isCellAccessible(prevX, checkY, board)) {
+                return false;
+            }
+        }
+        rockPiece.isRookMoving = true;
+        kingPiece.isKingMoving = true;
+
+        console.log('castle is possible');
+
+        return true;
     }
 
     isValid = (
@@ -222,7 +271,7 @@ export class ChessRules {
         team: Teams,
         type: PieceType,
         board: Pieces[]
-    ): boolean => {
+    ): boolean | kingMove => {
         if (type === 'PAWN')
             return this.pawnLogic(team, prevX, prevY, newX, newY, board, type);
 
@@ -238,8 +287,12 @@ export class ChessRules {
         if (type === 'QUEEN')
             return this.queenLogic(team, prevX, prevY, newX, newY, board);
 
-        if (type === 'KING')
-            return this.kingLogic(team, prevX, prevY, newX, newY, board);
+        if (type === 'KING') {
+            return (
+                this.castleLogic(prevX, prevY, newX, newY, board) ||
+                this.kingLogic(team, prevX, prevY, newX, newY, board)
+            );
+        }
 
         return false;
     };

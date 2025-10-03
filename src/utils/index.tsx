@@ -17,6 +17,8 @@ export const pushRocks = (piece: Pieces[]) => {
         y: 0,
         team: Teams.ME,
         type: PieceType.ROCK,
+        isRookMoving: false,
+        isKingMoving: false,
     });
     piece.push({
         image: Piece('wR'),
@@ -24,6 +26,8 @@ export const pushRocks = (piece: Pieces[]) => {
         y: 7,
         team: Teams.ME,
         type: PieceType.ROCK,
+        isRookMoving: false,
+        isKingMoving: false,
     });
     piece.push({
         image: Piece('bR'),
@@ -31,6 +35,8 @@ export const pushRocks = (piece: Pieces[]) => {
         y: 0,
         team: Teams.OPPONENT,
         type: PieceType.ROCK,
+        isRookMoving: false,
+        isKingMoving: false,
     });
     piece.push({
         image: Piece('bR'),
@@ -38,6 +44,8 @@ export const pushRocks = (piece: Pieces[]) => {
         y: 7,
         team: Teams.OPPONENT,
         type: PieceType.ROCK,
+        isRookMoving: false,
+        isKingMoving: false,
     });
 };
 
@@ -117,6 +125,8 @@ export const pushKQ = (piece: Pieces[]) => {
         y: 4,
         team: Teams.ME,
         type: PieceType.KING,
+        isRookMoving: false,
+        isKingMoving: false,
     });
     piece.push({
         image: Piece('bQ'),
@@ -131,5 +141,7 @@ export const pushKQ = (piece: Pieces[]) => {
         y: 4,
         team: Teams.OPPONENT,
         type: PieceType.KING,
+        isRookMoving: false,
+        isKingMoving: false,
     });
 };

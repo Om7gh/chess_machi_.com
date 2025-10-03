@@ -7,4 +7,6 @@ export interface Pieces {
     team: Teams;
     type: PieceType;
     isEmpassant?: boolean | undefined;
+    isKingMoving?: boolean | undefined;
+    isRookMoving?: boolean | undefined;
 }
