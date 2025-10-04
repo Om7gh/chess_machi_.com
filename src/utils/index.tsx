@@ -7,7 +7,7 @@ export const HORIZONTAL_AXIS = new Array(8)
     .map((_, i) => String.fromCharCode(i + 97));
 
 export const Piece = (type: string): string => {
-    return `assets/piece/fantasy/${type}.svg`;
+    return `assets/piece/spatial/${type}.svg`;
 };
 
 export const pushRocks = (piece: Pieces[]) => {

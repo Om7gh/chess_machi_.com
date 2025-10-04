@@ -10,3 +10,8 @@ export interface Pieces {
     isKingMoving?: boolean | undefined;
     isRookMoving?: boolean | undefined;
 }
+
+export interface Position {
+    x: number;
+    y: number;
+}

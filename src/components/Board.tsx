@@ -8,6 +8,7 @@ import Files from './Files';
 import Ranks from './Ranks';
 import type { PieceType } from '../types/enums';
 import PromotionModal from '../utils/PromotionModel';
+import { enPassant } from '../chessRules/PieceLogic/enPassant';
 
 export default function Board() {
     const boardRef = useRef<HTMLDivElement | null>(null);
@@ -139,7 +140,7 @@ export default function Board() {
                 return;
             }
 
-            const isEnPassantMove = rules.enPassant(
+            const isEnPassantMove = enPassant(
                 activePieceCoords.x,
                 activePieceCoords.y,
                 newX,
@@ -149,7 +150,7 @@ export default function Board() {
                 currentPiece.type
             );
 
-            const isValidMove = rules.isValid(
+            const moveResult = rules.isValid(
                 activePieceCoords.x,
                 activePieceCoords.y,
                 newX,
@@ -159,81 +160,88 @@ export default function Board() {
                 pieces
             );
 
-            if (isValidMove) {
-                // Check for pawn promotion
-                const isPromotionMove =
-                    currentPiece.type === 'PAWN' &&
-                    ((currentPiece.team === 'ME' && newX === 7) ||
-                        (currentPiece.team === 'OPPONENT' && newX === 0));
+            if (moveResult) {
+                if (Array.isArray(moveResult)) {
+                    setPieces(
+                        moveResult.map((p) => ({ ...p, isEmpassant: false }))
+                    );
+                } else if (moveResult === true) {
+                    const isPromotionMove =
+                        currentPiece.type === 'PAWN' &&
+                        ((currentPiece.team === 'ME' && newX === 7) ||
+                            (currentPiece.team === 'OPPONENT' && newX === 0));
 
-                if (isPromotionMove) {
-                    setPromotionPending({
-                        piece: currentPiece,
-                        newX,
-                        newY,
-                    });
-                } else {
-                    setPieces((prevPieces) => {
-                        const resetEnPassantPieces = prevPieces.map((p) => ({
-                            ...p,
-                            isEmpassant: false,
-                        }));
+                    if (isPromotionMove) {
+                        setPromotionPending({
+                            piece: currentPiece,
+                            newX,
+                            newY,
+                        });
+                    } else {
+                        setPieces((prevPieces) => {
+                            const resetEnPassantPieces = prevPieces.map(
+                                (p) => ({
+                                    ...p,
+                                    isEmpassant: false,
+                                })
+                            );
 
-                        return resetEnPassantPieces
-                            .map((p) => {
-                                if (
-                                    p.x === activePieceCoords.x &&
-                                    p.y === activePieceCoords.y
-                                ) {
+                            return resetEnPassantPieces
+                                .map((p) => {
                                     if (
-                                        Math.abs(activePieceCoords.x - newX) ===
-                                            2 &&
-                                        p.type === 'PAWN'
+                                        p.x === activePieceCoords.x &&
+                                        p.y === activePieceCoords.y
                                     ) {
-                                        return {
-                                            ...p,
-                                            x: newX,
-                                            y: newY,
-                                            isEmpassant: true,
-                                        };
-                                    } else {
-                                        return {
-                                            ...p,
-                                            x: newX,
-                                            y: newY,
-                                            isEmpassant: false,
-                                        };
+                                        if (
+                                            Math.abs(
+                                                activePieceCoords.x - newX
+                                            ) === 2 &&
+                                            p.type === 'PAWN'
+                                        ) {
+                                            return {
+                                                ...p,
+                                                x: newX,
+                                                y: newY,
+                                                isEmpassant: true,
+                                            };
+                                        } else {
+                                            return {
+                                                ...p,
+                                                x: newX,
+                                                y: newY,
+                                                isEmpassant: false,
+                                            };
+                                        }
                                     }
-                                }
 
-                                if (
-                                    p.x === newX &&
-                                    p.y === newY &&
-                                    p.team !== currentPiece.team
-                                ) {
-                                    return null;
-                                }
+                                    if (
+                                        p.x === newX &&
+                                        p.y === newY &&
+                                        p.team !== currentPiece.team
+                                    ) {
+                                        return null;
+                                    }
 
-                                if (
-                                    isEnPassantMove &&
-                                    p.x === activePieceCoords.x &&
-                                    p.y === newY &&
-                                    p.team !== currentPiece.team
-                                ) {
-                                    return null;
-                                }
+                                    if (
+                                        isEnPassantMove &&
+                                        p.x === activePieceCoords.x &&
+                                        p.y === newY &&
+                                        p.team !== currentPiece.team
+                                    ) {
+                                        return null;
+                                    }
 
-                                return p;
-                            })
-                            .filter((p) => p !== null);
-                    });
+                                    return p;
+                                })
+                                .filter((p) => p !== null);
+                        });
+                    }
                 }
             }
 
             resetDraggablePiece();
         }
     };
-
     const resetDraggablePiece = () => {
         if (draggablePiece) {
             draggablePiece.style.position = '';
