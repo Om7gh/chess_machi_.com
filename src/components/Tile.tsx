@@ -4,16 +4,16 @@ export default function Tile({
     file,
     rank,
     piece,
+    highlight,
 }: {
     file: number;
     rank: number;
     piece: string | undefined;
+    highlight: boolean;
 }) {
     const isLight = (rank + file) % 2 === 1;
     const tileId = `${HORIZONTAL_AXIS[file]}${VERTICAL_AXIS[rank]}`;
-
     const baseStyles = 'w-full h-full flex items-center justify-center';
-
     const lightTileStyle =
         'bg-[radial-gradient(circle_at_center,theme(colors.violet.900),theme(colors.violet.500))]';
     const darkTileStyle =
@@ -24,7 +24,7 @@ export default function Tile({
             key={tileId}
             className={`${baseStyles} ${
                 isLight ? lightTileStyle : darkTileStyle
-            }`}
+            } ${highlight ? 'possibleMove' : null}`}
         >
             {piece && (
                 <div

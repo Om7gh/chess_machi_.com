@@ -28,7 +28,17 @@ export default function Board() {
 
     const rules = new ChessRules();
 
+    function updateMoves() {
+        setPieces((prev) => {
+            return prev.map((p) => {
+                p.possibleMoves = rules.getPossibleMove(prev, p);
+                return p;
+            });
+        });
+    }
+
     const dragPiece = (e: React.MouseEvent<HTMLDivElement>) => {
+        updateMoves();
         const target = e.target as HTMLElement;
         const rect = boardRef.current?.getBoundingClientRect();
 
@@ -150,7 +160,7 @@ export default function Board() {
                 currentPiece.type
             );
 
-            const moveResult = rules.isValid(
+            const validMove = rules.isValid(
                 activePieceCoords.x,
                 activePieceCoords.y,
                 newX,
@@ -160,12 +170,12 @@ export default function Board() {
                 pieces
             );
 
-            if (moveResult) {
-                if (Array.isArray(moveResult)) {
+            if (validMove) {
+                if (Array.isArray(validMove)) {
                     setPieces(
-                        moveResult.map((p) => ({ ...p, isEmpassant: false }))
+                        validMove.map((p) => ({ ...p, isEmpassant: false }))
                     );
-                } else if (moveResult === true) {
+                } else if (validMove === true) {
                     const isPromotionMove =
                         currentPiece.type === 'PAWN' &&
                         ((currentPiece.team === 'ME' && newX === 7) ||
@@ -260,13 +270,25 @@ export default function Board() {
     for (let x = VERTICAL_AXIS.length - 1; x >= 0; x--) {
         for (let y = 0; y < HORIZONTAL_AXIS.length; y++) {
             let image = undefined;
-            pieces.forEach((p) => {
-                if (p.x === x && p.y === y) {
-                    image = p.image;
-                }
-            });
+            const currentPiece = pieces.find(
+                (p) =>
+                    p.x === activePieceCoords?.x && p.y === activePieceCoords?.y
+            );
+
+            const highlight = currentPiece?.possibleMoves
+                ? currentPiece.possibleMoves.some((p) => p.x === x && p.y === y)
+                : false;
+
+            image = pieces.find((p) => p.x === x && p.y === y)?.image;
+
             boardTiles.push(
-                <Tile piece={image} file={x} rank={y} key={`${x}-${y}`} />
+                <Tile
+                    piece={image}
+                    file={x}
+                    rank={y}
+                    key={`${x}-${y}`}
+                    highlight={highlight}
+                />
             );
         }
     }

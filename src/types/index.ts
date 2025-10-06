@@ -1,5 +1,10 @@
 import type { PieceType, Teams } from './enums';
 
+export interface Position {
+    x: number;
+    y: number;
+}
+
 export interface Pieces {
     image: string;
     x: number;
@@ -9,9 +14,6 @@ export interface Pieces {
     isEmpassant?: boolean | undefined;
     isKingMoving?: boolean | undefined;
     isRookMoving?: boolean | undefined;
-}
-
-export interface Position {
-    x: number;
-    y: number;
+    possibleMoves?: Position[] | undefined;
+    possbileCastle?: boolean | undefined;
 }

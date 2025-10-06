@@ -127,6 +127,7 @@ export const pushKQ = (piece: Pieces[]) => {
         type: PieceType.KING,
         isRookMoving: false,
         isKingMoving: false,
+        possbileCastle: false,
     });
     piece.push({
         image: Piece('bQ'),
@@ -143,5 +144,6 @@ export const pushKQ = (piece: Pieces[]) => {
         type: PieceType.KING,
         isRookMoving: false,
         isKingMoving: false,
+        possbileCastle: false,
     });
 };

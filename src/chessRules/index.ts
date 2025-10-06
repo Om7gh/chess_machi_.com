@@ -7,6 +7,12 @@ import { knightLogic } from './PieceLogic/knightLogic';
 import { pawnLogic } from './PieceLogic/pawnRules';
 import { queenLogic } from './PieceLogic/queenLogic';
 import { rookLogic } from './PieceLogic/rockLogic';
+import { getBishopPossibleMoves } from './PossibleMoves/bishopPossibleMoves';
+import { getKingPossibleMoves } from './PossibleMoves/kingPossibleMoves';
+import { getKnightPossibleMoves } from './PossibleMoves/knightPossibleMoves';
+import { getPawnPossibleMoves } from './PossibleMoves/pawnPossibleMoves';
+import { getQueenPossibleMoves } from './PossibleMoves/queenPossibleMoves';
+import { getRockPossibleMoves } from './PossibleMoves/rockPossibleMoves';
 
 export class ChessRules {
     isValid = (
@@ -52,28 +58,22 @@ export class ChessRules {
         return false;
     };
 
-    // getPossibleMove(board: Pieces[], type: PieceType) {
-    //     let possibleMoves: Position[] = [];
-    //     switch (type) {
-    //         case 'PAWN':
-    //             possibleMoves = getPawnPossibleMoves(board);
-    //             break;
-    //         case 'KING':
-    //             possibleMoves = getKingPossibleMoves(board);
-    //             break;
-    //         case 'KNIGHT':
-    //             possibleMoves = getKnightPossibleMoves(board);
-    //             break;
-    //         case 'QUEEN':
-    //             possibleMoves = getQueenPossibleMoves(board);
-    //             break;
-    //         case 'BISHOP':
-    //             possibleMoves = getBishopPossibleMoves(board);
-    //             break;
-    //         case 'ROCK':
-    //             possibleMoves = getRockPossibleMoves(board);
-    //             break;
-    //     }
-    //     return possibleMoves;
-    // }
+    getPossibleMove(board: Pieces[], piece: Pieces): Position[] {
+        switch (piece.type) {
+            case 'PAWN':
+                return getPawnPossibleMoves(piece, board);
+            case 'KING':
+                return getKingPossibleMoves(piece, board);
+            case 'KNIGHT':
+                return getKnightPossibleMoves(piece, board);
+            case 'QUEEN':
+                return getQueenPossibleMoves(piece, board);
+            case 'BISHOP':
+                return getBishopPossibleMoves(piece, board);
+            case 'ROCK':
+                return getRockPossibleMoves(piece, board);
+            default:
+                return [];
+        }
+    }
 }

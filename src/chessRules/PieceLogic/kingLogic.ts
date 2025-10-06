@@ -1,7 +1,6 @@
-import type { Pieces } from "../../types";
-import type { Teams } from "../../types/enums";
-import { isCellOccupiedByMe } from "../utills";
-
+import type { Pieces } from '../../types';
+import type { Teams } from '../../types/enums';
+import { isCellOccupiedByMe } from '../utills';
 
 const kingLogic = (
     team: Teams,

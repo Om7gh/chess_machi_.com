@@ -1,21 +1,27 @@
 @import 'tailwindcss';
 
 * {
-  user-select: none;
+    user-select: none;
 }
 
 .App {
-  background-image: url(assets/bg1.png);
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 100vh;
+    background-image: url(assets/bg1.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 100vh;
 }
 
 #board {
-  width: 40vmax;
-  height: 40vmax;
-  display: grid;
-  grid-template-columns: repeat(8, 5vmax);
-  grid-template-rows: repeat(8, 5vmax);
-  position: relative;
+    width: 40vmax;
+    height: 40vmax;
+    display: grid;
+    grid-template-columns: repeat(8, 5vmax);
+    grid-template-rows: repeat(8, 5vmax);
+    position: relative;
+}
+
+.possibleMove {
+    background: radial-gradient(rgb(255, 160, 255), rgb(150, 91, 238));
+    border: 1px solid rgb(24, 10, 24);
+    border-bottom: none;
 }
