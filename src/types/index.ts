@@ -15,5 +15,12 @@ export interface Pieces {
     isKingMoving?: boolean | undefined;
     isRookMoving?: boolean | undefined;
     possibleMoves?: Position[] | undefined;
-    possbileCastle?: boolean | undefined;
+}
+
+export interface Props {
+    pieces: Pieces[];
+    setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
+    setPromotionPending: (
+        promotion: { piece: Pieces; newX: number; newY: number } | null
+    ) => void;
 }

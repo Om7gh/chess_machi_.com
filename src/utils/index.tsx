@@ -7,7 +7,7 @@ export const HORIZONTAL_AXIS = new Array(8)
     .map((_, i) => String.fromCharCode(i + 97));
 
 export const Piece = (type: string): string => {
-    return `assets/piece/spatial/${type}.svg`;
+    return `assets/piece/fantasy/${type}.svg`;
 };
 
 export const pushRocks = (piece: Pieces[]) => {
@@ -127,7 +127,6 @@ export const pushKQ = (piece: Pieces[]) => {
         type: PieceType.KING,
         isRookMoving: false,
         isKingMoving: false,
-        possbileCastle: false,
     });
     piece.push({
         image: Piece('bQ'),
@@ -144,6 +143,5 @@ export const pushKQ = (piece: Pieces[]) => {
         type: PieceType.KING,
         isRookMoving: false,
         isKingMoving: false,
-        possbileCastle: false,
     });
 };

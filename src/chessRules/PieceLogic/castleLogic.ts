@@ -48,8 +48,6 @@ const castleLogic = (
     //     }
     // }
 
-    console.log('Castle is possible');
-
     const updatedBoard = board.map((piece) => {
         if (piece.x === prevX && piece.y === prevY && piece.type === 'KING') {
             const kingNewY = prevY + 2 * yDirection;

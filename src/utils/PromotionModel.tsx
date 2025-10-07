@@ -18,8 +18,8 @@ const PromotionModal = ({
     const teamType = team === 'ME' ? 0 : 1;
 
     return (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-slate-900/50 flex justify-center items-center z-50 w-full m-auto">
-            <div className="flex justify-evenly bg-violet-700/80 backdrop:backdrop-blur-3xl w-[40vmax] py-8">
+        <div className="fixed top-0 left-0 right-0 bottom-0 bg-slate-900/50 backdrop-blur-sm flex justify-center items-center z-50 w-full m-auto">
+            <div className="flex justify-evenly bg-violet-400/80 backdrop-blur-md rounded-lg w-[40vmax] py-8">
                 {promotionPieces.map((pieceType) => {
                     let pieceImage;
                     switch (pieceType) {
@@ -46,18 +46,21 @@ const PromotionModal = ({
                         <button
                             key={pieceType}
                             onClick={() => onSelect(pieceType)}
+                            className="hover:scale-110 transition-transform duration-200"
                         >
                             <img
                                 src={pieceImage}
                                 alt={pieceType}
-                                style={{ width: '50px', height: '50px' }}
+                                className="w-12 h-12"
                                 onError={(e) => {
                                     (
                                         e.target as HTMLImageElement
                                     ).style.display = 'none';
                                 }}
                             />
-                            <div>{pieceType}</div>
+                            <div className="text-slate-200 font-semibold mt-2">
+                                {pieceType}
+                            </div>
                         </button>
                     );
                 })}

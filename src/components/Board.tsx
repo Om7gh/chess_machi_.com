@@ -1,18 +1,18 @@
 import { useRef, useState } from 'react';
-import type { Pieces } from '../types';
 import { HORIZONTAL_AXIS, Piece, VERTICAL_AXIS } from '../utils';
 import Tile from './Tile';
-import { initBoard } from '../utils/initBoard';
 import { ChessRules } from '../chessRules';
 import Files from './Files';
 import Ranks from './Ranks';
-import type { PieceType } from '../types/enums';
-import PromotionModal from '../utils/PromotionModel';
 import { enPassant } from '../chessRules/PieceLogic/enPassant';
+import type { Props } from '../types';
 
-export default function Board() {
+export default function Board({
+    pieces,
+    setPieces,
+    setPromotionPending,
+}: Props) {
     const boardRef = useRef<HTMLDivElement | null>(null);
-    const [pieces, setPieces] = useState<Pieces[]>(initBoard);
     const [draggablePiece, setDraggablePiece] = useState<HTMLElement | null>(
         null
     );
@@ -20,19 +20,17 @@ export default function Board() {
         x: number;
         y: number;
     } | null>(null);
-    const [promotionPending, setPromotionPending] = useState<{
-        piece: Pieces;
-        newX: number;
-        newY: number;
-    } | null>(null);
 
     const rules = new ChessRules();
 
     function updateMoves() {
         setPieces((prev) => {
             return prev.map((p) => {
-                p.possibleMoves = rules.getPossibleMove(prev, p);
-                return p;
+                const possibleMoves = rules.getPossibleMove(prev, p);
+                return {
+                    ...p,
+                    possibleMoves,
+                };
             });
         });
     }
@@ -73,63 +71,6 @@ export default function Board() {
             draggablePiece.style.left = `${x}px`;
             draggablePiece.style.top = `${y}px`;
         }
-    };
-
-    const handlePromotion = (promotionType: PieceType) => {
-        if (!promotionPending) return;
-
-        const { piece, newX, newY } = promotionPending;
-
-        setPieces((prevPieces) => {
-            const updatedPieces = prevPieces
-                .map((p) => ({
-                    ...p,
-                    isEmpassant: false,
-                }))
-                .filter((p) => {
-                    if (p.x === piece.x && p.y === piece.y) {
-                        return false;
-                    }
-                    if (p.x === newX && p.y === newY && p.team !== piece.team) {
-                        return false;
-                    }
-                    return true;
-                });
-
-            let pieceImage;
-            const pieceType = piece.team === 'ME' ? 0 : 1;
-
-            switch (promotionType) {
-                case 'QUEEN':
-                    pieceImage = pieceType === 0 ? Piece('wQ') : Piece('bQ');
-                    break;
-                case 'ROCK':
-                    pieceImage = pieceType === 0 ? Piece('wR') : Piece('bR');
-                    break;
-                case 'BISHOP':
-                    pieceImage = pieceType === 0 ? Piece('wB') : Piece('bB');
-                    break;
-                case 'KNIGHT':
-                    pieceImage = pieceType === 0 ? Piece('wN') : Piece('bN');
-                    break;
-                default:
-                    console.log('invalid piece');
-            }
-
-            return [
-                ...updatedPieces,
-                {
-                    ...piece,
-                    x: newX,
-                    y: newY,
-                    type: promotionType,
-                    isEmpassant: false,
-                    image: pieceImage,
-                },
-            ];
-        });
-
-        setPromotionPending(null);
     };
 
     const dropPiece = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -252,6 +193,7 @@ export default function Board() {
             resetDraggablePiece();
         }
     };
+
     const resetDraggablePiece = () => {
         if (draggablePiece) {
             draggablePiece.style.position = '';
@@ -294,7 +236,6 @@ export default function Board() {
     }
 
     return (
-        <>
             <div
                 ref={boardRef}
                 id="board"
@@ -307,13 +248,5 @@ export default function Board() {
                 {boardTiles}
                 <Ranks />
             </div>
-
-            {promotionPending && (
-                <PromotionModal
-                    team={promotionPending.piece.team}
-                    onSelect={handlePromotion}
-                />
-            )}
-        </>
     );
 }
