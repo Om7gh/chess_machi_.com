@@ -1,5 +1,6 @@
 import type { Pieces } from '../../types';
 import { isCellAccessible } from '../utills';
+import { isKingInCheck } from './kingLogic';
 
 const castleLogic = (
     prevX: number,
@@ -37,16 +38,16 @@ const castleLogic = (
         }
     }
 
-    // if (isKingInCheck(kingPiece.team, board)) {
-    //     return { isValid: false };
-    // }
+    if (isKingInCheck(kingPiece.team, board, kingPiece.x, kingPiece.y)) {
+        return { isValid: false };
+    }
 
-    // for (let i = 1; i <= 2; i++) {
-    //     const checkY = prevY + i * yDirection;
-    //     if (isSquareUnderAttack(prevX, checkY, kingPiece.team, board)) {
-    //         return { isValid: false };
-    //     }
-    // }
+    for (let i = 1; i <= 2; i++) {
+        const checkY = prevY + i * yDirection;
+        if (isKingInCheck(kingPiece.team, board, prevX, checkY)) {
+            return { isValid: false };
+        }
+    }
 
     const updatedBoard = board.map((piece) => {
         if (piece.x === prevX && piece.y === prevY && piece.type === 'KING') {

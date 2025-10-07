@@ -51,7 +51,6 @@ export class ChessRules {
                 if (castleResult.isValid && castleResult.updatedBoard) {
                     return castleResult.updatedBoard;
                 }
-
                 return kingLogic(team, prevX, prevY, newX, newY, board);
             }
         }

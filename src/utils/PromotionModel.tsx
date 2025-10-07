@@ -51,7 +51,7 @@ const PromotionModal = ({
                             <img
                                 src={pieceImage}
                                 alt={pieceType}
-                                className="w-12 h-12"
+                                className="w-[4vmax] h-[4vmax]"
                                 onError={(e) => {
                                     (
                                         e.target as HTMLImageElement

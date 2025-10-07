@@ -1,4 +1,5 @@
 import type { Pieces, Position } from '../../types';
+import { isKingInCheck } from '../PieceLogic/kingLogic';
 import { isCellAccessible, isCellOccupiedByOpponent } from '../utills';
 
 export const getKingPossibleMoves = (
@@ -22,6 +23,8 @@ export const getKingPossibleMoves = (
         const targetX = king.x + dir.x;
         const targetY = king.y + dir.y;
 
+        if (isKingInCheck(king.team, board, targetX, targetY)) continue;
+
         if (targetX >= 0 && targetX <= 7 && targetY >= 0 && targetY <= 7) {
             if (
                 isCellAccessible(targetX, targetY, board) ||
@@ -40,7 +43,12 @@ export const getKingPossibleMoves = (
         const kingsideRook = rooks.find((p) => p.y > king.y);
         if (kingsideRook) {
             let pathClear = true;
+
             for (let y = king.y + 1; y < kingsideRook.y; y++) {
+                if (isKingInCheck(king.team, board, king.x, y - 1)) {
+                    pathClear = false;
+                    break;
+                }
                 if (!isCellAccessible(king.x, y, board)) {
                     pathClear = false;
                     break;
@@ -55,6 +63,10 @@ export const getKingPossibleMoves = (
         if (queensideRook) {
             let pathClear = true;
             for (let y = queensideRook.y + 1; y < king.y; y++) {
+                if (isKingInCheck(king.team, board, king.x, y - 1)) {
+                    pathClear = false;
+                    break;
+                }
                 if (!isCellAccessible(king.x, y, board)) {
                     pathClear = false;
                     break;

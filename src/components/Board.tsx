@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { HORIZONTAL_AXIS, Piece, VERTICAL_AXIS } from '../utils';
+import { HORIZONTAL_AXIS, VERTICAL_AXIS } from '../utils';
 import Tile from './Tile';
 import { ChessRules } from '../chessRules';
 import Files from './Files';
@@ -236,17 +236,17 @@ export default function Board({
     }
 
     return (
-            <div
-                ref={boardRef}
-                id="board"
-                onMouseDown={dragPiece}
-                onMouseMove={movePiece}
-                onMouseUp={dropPiece}
-                style={{ position: 'relative' }}
-            >
-                <Files />
-                {boardTiles}
-                <Ranks />
-            </div>
+        <div
+            ref={boardRef}
+            id="board"
+            onMouseDown={dragPiece}
+            onMouseMove={movePiece}
+            onMouseUp={dropPiece}
+            style={{ position: 'relative' }}
+        >
+            <Files />
+            {boardTiles}
+            <Ranks />
+        </div>
     );
 }
