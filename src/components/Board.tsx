@@ -21,6 +21,8 @@ export default function Board({
         y: number;
     } | null>(null);
 
+    const [turns, setTurns] = useState(1);
+
     const rules = new ChessRules();
 
     function updateMoves() {
@@ -89,6 +91,18 @@ export default function Board({
             if (!currentPiece) {
                 resetDraggablePiece();
                 return;
+            }
+
+             if (currentPiece?.team === "ME" && turns % 2 === 0)
+            {
+                    resetDraggablePiece();
+                    return;
+            }
+
+             if (currentPiece?.team === "OPPONENT" && turns % 2 === 1)
+            {
+                    resetDraggablePiece();
+                    return;
             }
 
             const isEnPassantMove = enPassant(
@@ -188,8 +202,8 @@ export default function Board({
                         });
                     }
                 }
+                setTurns(prev => prev + 1)
             }
-
             resetDraggablePiece();
         }
     };
@@ -217,9 +231,15 @@ export default function Board({
                     p.x === activePieceCoords?.x && p.y === activePieceCoords?.y
             );
 
-            const highlight = currentPiece?.possibleMoves
+            let highlight = currentPiece?.possibleMoves
                 ? currentPiece.possibleMoves.some((p) => p.x === x && p.y === y)
                 : false;
+
+             if (currentPiece?.team === "ME" && turns % 2 === 0)
+                    highlight = false
+
+             if (currentPiece?.team === "OPPONENT" && turns % 2 === 1)
+                highlight = false
 
             image = pieces.find((p) => p.x === x && p.y === y)?.image;
 

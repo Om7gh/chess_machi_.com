@@ -1,4 +1,3 @@
-// kingLogic.ts
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
 import { isCellOccupiedByMe } from '../utills';
