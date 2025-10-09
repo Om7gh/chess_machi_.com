@@ -1,11 +1,11 @@
+import type { Props } from '../types';
 import { useRef, useState } from 'react';
-import { HORIZONTAL_AXIS, VERTICAL_AXIS } from '../utils';
-import Tile from './Tile';
 import { ChessRules } from '../chessRules';
+import { boardTile } from '../utils/boardTiles';
+import { draggableEvent } from '../events';
+import { getBoardCoordinates, getCurrentPiece, handleValidMove, validateTurn } from '../events/dropEvent';
 import Files from './Files';
 import Ranks from './Ranks';
-import { enPassant } from '../chessRules/PieceLogic/enPassant';
-import type { Props } from '../types';
 
 export default function Board({
     pieces,
@@ -20,9 +20,7 @@ export default function Board({
         x: number;
         y: number;
     } | null>(null);
-
     const [turns, setTurns] = useState(1);
-
     const rules = new ChessRules();
 
     function updateMoves() {
@@ -39,29 +37,7 @@ export default function Board({
 
     const dragPiece = (e: React.MouseEvent<HTMLDivElement>) => {
         updateMoves();
-        const target = e.target as HTMLElement;
-        const rect = boardRef.current?.getBoundingClientRect();
-
-        if (target.classList.contains('piece') && rect) {
-            const tileSize = rect.width / 8;
-            const x = 7 - Math.floor((e.clientY - rect.top) / tileSize);
-            const y = Math.floor((e.clientX - rect.left) / tileSize);
-
-            setDraggablePiece(target);
-            setActivePieceCoords({ x, y });
-
-            target.style.position = 'absolute';
-            target.style.width = '4vmax';
-            target.style.height = '4vmax';
-            target.style.pointerEvents = 'none';
-            target.style.zIndex = '1000';
-
-            const boardX = e.clientX - rect.left - target.offsetHeight / 2;
-            const boardY = e.clientY - rect.top - target.offsetWidth / 2;
-
-            target.style.left = `${boardX}px`;
-            target.style.top = `${boardY}px`;
-        }
+        draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords)
     };
 
     const movePiece = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -76,136 +52,41 @@ export default function Board({
     };
 
     const dropPiece = (e: React.MouseEvent<HTMLDivElement>) => {
-        const rect = boardRef.current?.getBoundingClientRect();
-        if (draggablePiece && rect && activePieceCoords) {
-            const tileSize = rect.width / 8;
+        if (!draggablePiece || !activePieceCoords) {
+        return resetDraggablePiece();
+    }
 
-            const newX = 7 - Math.floor((e.clientY - rect.top) / tileSize);
-            const newY = Math.floor((e.clientX - rect.left) / tileSize);
+    const boardCoords = getBoardCoordinates(e, boardRef);
+    if (!boardCoords) return resetDraggablePiece();
 
-            const currentPiece = pieces.find(
-                (p) =>
-                    p.x === activePieceCoords.x && p.y === activePieceCoords.y
-            );
+    const { newX, newY } = boardCoords;
+    const currentPiece = getCurrentPiece(activePieceCoords, pieces);
+    
+    if (!currentPiece) return resetDraggablePiece();
+    if (!validateTurn(currentPiece, turns)) return resetDraggablePiece();
 
-            if (!currentPiece) {
-                resetDraggablePiece();
-                return;
-            }
+    const validMove = rules.isValid(
+        activePieceCoords.x,
+        activePieceCoords.y,
+        newX,
+        newY,
+        currentPiece.team,
+        currentPiece.type,
+        pieces
+    );
 
-             if (currentPiece?.team === "ME" && turns % 2 === 0)
-            {
-                    resetDraggablePiece();
-                    return;
-            }
-
-             if (currentPiece?.team === "OPPONENT" && turns % 2 === 1)
-            {
-                    resetDraggablePiece();
-                    return;
-            }
-
-            const isEnPassantMove = enPassant(
-                activePieceCoords.x,
-                activePieceCoords.y,
-                newX,
-                newY,
-                currentPiece.team,
-                pieces,
-                currentPiece.type
-            );
-
-            const validMove = rules.isValid(
-                activePieceCoords.x,
-                activePieceCoords.y,
-                newX,
-                newY,
-                currentPiece.team,
-                currentPiece.type,
-                pieces
-            );
-
-            if (validMove) {
-                if (Array.isArray(validMove)) {
-                    setPieces(
-                        validMove.map((p) => ({ ...p, isEmpassant: false }))
-                    );
-                } else if (validMove === true) {
-                    const isPromotionMove =
-                        currentPiece.type === 'PAWN' &&
-                        ((currentPiece.team === 'ME' && newX === 7) ||
-                            (currentPiece.team === 'OPPONENT' && newX === 0));
-
-                    if (isPromotionMove) {
-                        setPromotionPending({
-                            piece: currentPiece,
-                            newX,
-                            newY,
-                        });
-                    } else {
-                        setPieces((prevPieces) => {
-                            const resetEnPassantPieces = prevPieces.map(
-                                (p) => ({
-                                    ...p,
-                                    isEmpassant: false,
-                                })
-                            );
-
-                            return resetEnPassantPieces
-                                .map((p) => {
-                                    if (
-                                        p.x === activePieceCoords.x &&
-                                        p.y === activePieceCoords.y
-                                    ) {
-                                        if (
-                                            Math.abs(
-                                                activePieceCoords.x - newX
-                                            ) === 2 &&
-                                            p.type === 'PAWN'
-                                        ) {
-                                            return {
-                                                ...p,
-                                                x: newX,
-                                                y: newY,
-                                                isEmpassant: true,
-                                            };
-                                        } else {
-                                            return {
-                                                ...p,
-                                                x: newX,
-                                                y: newY,
-                                                isEmpassant: false,
-                                            };
-                                        }
-                                    }
-
-                                    if (
-                                        p.x === newX &&
-                                        p.y === newY &&
-                                        p.team !== currentPiece.team
-                                    ) {
-                                        return null;
-                                    }
-
-                                    if (
-                                        isEnPassantMove &&
-                                        p.x === activePieceCoords.x &&
-                                        p.y === newY &&
-                                        p.team !== currentPiece.team
-                                    ) {
-                                        return null;
-                                    }
-
-                                    return p;
-                                })
-                                .filter((p) => p !== null);
-                        });
-                    }
-                }
-                setTurns(prev => prev + 1)
-            }
-            resetDraggablePiece();
-        }
+    validMove && handleValidMove(
+        validMove,
+        activePieceCoords,
+        newX,
+        newY,
+        currentPiece,
+        pieces,
+        setPieces,
+        setPromotionPending,
+        setTurns
+    );
+    resetDraggablePiece();
     };
 
     const resetDraggablePiece = () => {
@@ -222,39 +103,7 @@ export default function Board({
         setActivePieceCoords(null);
     };
 
-    const boardTiles = [];
-    for (let x = VERTICAL_AXIS.length - 1; x >= 0; x--) {
-        for (let y = 0; y < HORIZONTAL_AXIS.length; y++) {
-            let image = undefined;
-            const currentPiece = pieces.find(
-                (p) =>
-                    p.x === activePieceCoords?.x && p.y === activePieceCoords?.y
-            );
-
-            let highlight = currentPiece?.possibleMoves
-                ? currentPiece.possibleMoves.some((p) => p.x === x && p.y === y)
-                : false;
-
-             if (currentPiece?.team === "ME" && turns % 2 === 0)
-                    highlight = false
-
-             if (currentPiece?.team === "OPPONENT" && turns % 2 === 1)
-                highlight = false
-
-            image = pieces.find((p) => p.x === x && p.y === y)?.image;
-
-            boardTiles.push(
-                <Tile
-                    piece={image}
-                    file={x}
-                    rank={y}
-                    key={`${x}-${y}`}
-                    highlight={highlight}
-                />
-            );
-        }
-    }
-
+    const boardTiles = boardTile({pieces, activePieceCoords, turns});
     return (
         <div
             ref={boardRef}

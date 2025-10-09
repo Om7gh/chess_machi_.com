@@ -41,9 +41,7 @@ export const isKingInCheck = (
     if (!king) {
         return false;
     }
-
     const opponentPieces = board.filter((piece) => piece.team !== team);
-
     for (const piece of opponentPieces) {
         if (piece.type === 'PAWN') {
             const pawnIsDanger = pawnCheck(piece, newX, newY);
