@@ -2,7 +2,7 @@ import type { Pieces } from '../../types';
 import type { PieceType, Teams } from '../../types/enums';
 import { isCellAccessible, isCellOccupiedByOpponent } from '../utills';
 import { enPassant } from './enPassant';
-import { isKingInCheck } from './kingLogic';
+import { wouldKingBeInCheck, wouldKingBeInCheckAfterEnPassant } from './kingProtection';
 
 const pawnLogic = (
     team: Teams,
@@ -17,12 +17,13 @@ const pawnLogic = (
     const startRow = team === 'ME' ? 1 : 6;
     const king = board.find(p => p.team === team && p.type === "KING");
 
-    if (!king) return false
+    if (!king) return false;
 
-    if (newX === prevX + direction && newY === prevY)
-    {
-        if (!isCellAccessible(newX, newY, board))
-            return false
+    if (newX === prevX + direction && newY === prevY) {
+        if (!isCellAccessible(newX, newY, board)) {
+            return false;
+        }
+        return !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board);
     }
 
     if (
@@ -32,32 +33,27 @@ const pawnLogic = (
     ) {
         const midX = prevX + direction;
         if (!isCellAccessible(midX, newY, board) ||
-            !isCellAccessible(newX, newY, board))
-        return false
+            !isCellAccessible(newX, newY, board)) {
+            return false;
+        }
+        return !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board);
     }
 
-    if (newX === prevX + direction && Math.abs(newY - prevY) === 1)
-    {
-        if (!isCellOccupiedByOpponent(newX, newY, board, team))
-            return false
+    if (newX === prevX + direction && Math.abs(newY - prevY) === 1) {
+        if (isCellOccupiedByOpponent(newX, newY, board, team)) {
+            return !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board);
+        }
+        if (enPassant(prevX, prevY, newX, newY, team, board, type)) {
+            return !wouldKingBeInCheckAfterEnPassant(prevX, prevY, newX, newY, team, board);
+        }
+        return false;
     }
-    if (enPassant(prevX, prevY, newX, newY, team, board, type))
-            return true
 
-    const tempBoard = board.map(piece => {
-        if (piece.x === prevX && piece.y === prevY) {
-            return { ...piece, x: newX, y: newY };
-        }
-        if (piece.x === newX && piece.y === newY && piece.team !== team) {
-            return null;
-        }
-        return piece;
-    }).filter(Boolean) as Pieces[];
+    if (enPassant(prevX, prevY, newX, newY, team, board, type)) {
+        return !wouldKingBeInCheckAfterEnPassant(prevX, prevY, newX, newY, team, board);
+    }
 
-    if (isKingInCheck(team, tempBoard, king.x, king.y))
-        return false
-
-    return true
+    return false;
 };
 
 export { pawnLogic };

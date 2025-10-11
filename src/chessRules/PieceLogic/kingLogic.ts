@@ -1,6 +1,7 @@
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
-import { isCellOccupiedByMe } from '../utills';
+import { isCellOccupiedByMe, isCellOccupiedByOpponent } from '../utills';
+import { wouldKingBeInCheck } from './kingProtection';
 
 const kingLogic = (
     team: Teams,
@@ -21,9 +22,27 @@ const kingLogic = (
         return false;
     }
 
-    if (isKingInCheck(team, board, newX, newY)) {
-        return false;
+   if (isCellOccupiedByOpponent(newX, newY, board, team)) {
+        const opponentTeam = team === 'ME' ? 'OPPONENT' : 'ME';
+        const opponentPieces = board.filter(p => p.team === opponentTeam);
+
+        for (const piece of opponentPieces) {
+            if (!piece.possibleMoves)
+                continue;
+
+            for (const move of piece.possibleMoves) {
+                if (move.x === newX && move.y === newY && piece.x !== newX && piece.y !== newY) {
+                    return false;
+                }
+            }
+        }
     }
+
+    if (wouldKingBeInCheck(prevX, prevY, newX, newY, team, board))
+        return false
+     
+    if (isKingInCheck(team, board, newX, newY))
+        return false;
 
     return true;
 };
@@ -38,9 +57,8 @@ export const isKingInCheck = (
         (piece) => piece.type === 'KING' && piece.team === team
     );
 
-    if (!king) {
+    if (!king)
         return false;
-    }
     const opponentPieces = board.filter((piece) => piece.team !== team);
     for (const piece of opponentPieces) {
         if (piece.type === 'PAWN') {
@@ -69,11 +87,8 @@ const pawnCheck = (pawn: Pieces, newX: number, newY: number) => {
     ];
 
     for (const moves of pawnAttackMoves) {
-        if (moves.x === newX && moves.y === newY) {
-            console.log(moves.x, moves.y);
-            console.log(newX, newY);
+        if (moves.x === newX && moves.y === newY)
             return true;
-        }
     }
     return false;
 };

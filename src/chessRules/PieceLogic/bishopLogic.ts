@@ -1,6 +1,7 @@
 import type { Pieces } from "../../types";
 import type { Teams } from "../../types/enums";
 import { isCellAccessible, isCellOccupiedByMe } from "../utills";
+import { wouldKingBeInCheck } from "./kingProtection";
 
 const bishopLogic = (
     team: Teams,
@@ -25,7 +26,9 @@ const bishopLogic = (
             return false;
         }
     }
-    return isCellOccupiedByMe(newX, newY, board, team);
+    if (isCellOccupiedByMe(newX, newY, board, team))
+        return !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
+    return false
 };
 
 export { bishopLogic };

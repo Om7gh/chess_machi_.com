@@ -4,13 +4,13 @@ import { ChessRules } from '../chessRules';
 import { boardTile } from '../utils/boardTiles';
 import { draggableEvent } from '../events';
 import { getBoardCoordinates, getCurrentPiece, handleValidMove, validateTurn } from '../events/dropEvent';
-import Files from './Files';
-import Ranks from './Ranks';
 
 export default function Board({
     pieces,
     setPieces,
     setPromotionPending,
+    checkmate,
+    setCheckmate
 }: Props) {
     const boardRef = useRef<HTMLDivElement | null>(null);
     const [draggablePiece, setDraggablePiece] = useState<HTMLElement | null>(
@@ -36,11 +36,15 @@ export default function Board({
     }
 
     const dragPiece = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (checkmate)
+            return ;
         updateMoves();
         draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords)
     };
 
     const movePiece = (e: React.MouseEvent<HTMLDivElement>) => {
+         if (checkmate)
+            return ;
         const rect = boardRef.current?.getBoundingClientRect();
         if (draggablePiece && rect) {
             const x = e.clientX - rect.left - draggablePiece.offsetWidth / 2;
@@ -52,6 +56,8 @@ export default function Board({
     };
 
     const dropPiece = (e: React.MouseEvent<HTMLDivElement>) => {
+         if (checkmate)
+            return ;
         if (!draggablePiece || !activePieceCoords) {
         return resetDraggablePiece();
     }
@@ -113,9 +119,7 @@ export default function Board({
             onMouseUp={dropPiece}
             style={{ position: 'relative' }}
         >
-            <Files />
             {boardTiles}
-            <Ranks />
         </div>
     );
 }

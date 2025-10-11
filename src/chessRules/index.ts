@@ -58,6 +58,71 @@ export class ChessRules {
     };
 
     getPossibleMove(board: Pieces[], piece: Pieces): Position[] {
+        let possibleMoves: Position[] = [];
+        switch (piece.type) {
+            case 'PAWN':
+                possibleMoves = getPawnPossibleMoves(piece, board);
+                break;
+            case 'KING':
+                possibleMoves = getKingPossibleMoves(piece, board);
+                break;
+            case 'KNIGHT':
+                possibleMoves = getKnightPossibleMoves(piece, board);
+                break;
+            case 'QUEEN':
+                possibleMoves = getQueenPossibleMoves(piece, board);
+                break;
+            case 'BISHOP':
+                possibleMoves = getBishopPossibleMoves(piece, board);
+                break;
+            case 'ROCK':
+                possibleMoves = getRockPossibleMoves(piece, board);
+                break;
+            default:
+                return [];
+        }
+
+        return this.filterMovesThatExposeKing(piece, possibleMoves, board);
+    }
+
+    private filterMovesThatExposeKing(
+        piece: Pieces, 
+        possibleMoves: Position[], 
+        board: Pieces[]
+    ): Position[] {
+        return possibleMoves.filter(move => {
+            const tempBoard = board.map(p => {
+                if (p.x === piece.x && p.y === piece.y) {
+                    return { ...p, x: move.x, y: move.y };
+                }
+                if (p.x === move.x && p.y === move.y && p.team !== piece.team) {
+                    return null;
+                }
+                return p;
+            }).filter(Boolean) as Pieces[];
+
+            return !this.isKingInCheckAfterMove(piece.team, tempBoard);
+        });
+    }
+
+    private isKingInCheckAfterMove(team: Teams, board: Pieces[]): boolean {
+        const king = board.find(p => p.type === 'KING' && p.team === team);
+        if (!king) return false;
+
+        const opponentPieces = board.filter(p => p.team !== team);
+
+        for (const opponentPiece of opponentPieces) {
+            const opponentMoves = this.getBasicPossibleMoves(opponentPiece, board);
+            for (const move of opponentMoves) {
+                if (move.x === king.x && move.y === king.y) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private getBasicPossibleMoves(piece: Pieces, board: Pieces[]): Position[] {
         switch (piece.type) {
             case 'PAWN':
                 return getPawnPossibleMoves(piece, board);

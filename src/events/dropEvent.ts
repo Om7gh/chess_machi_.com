@@ -105,15 +105,19 @@ const handleValidMove = (
     pieces: Pieces[],
     setPieces: (pieces: Pieces[] | ((prev: Pieces[]) => Pieces[])) => void,
     setPromotionPending: (promotion: {
-    piece: Pieces;
-    newX: number;
-    newY: number;
-} | null | null) => void,
+        piece: Pieces;
+        newX: number;
+        newY: number;
+    } | null) => void,
     setTurns: (updater: (prev: number) => number) => void
 ): void => {
+    const pieceMoved = activePieceCoords.x !== newX || activePieceCoords.y !== newY;
+
     if (Array.isArray(validMove)) {
         setPieces(validMove.map((p) => ({ ...p, isEmpassant: false })));
-        setTurns(prev => prev + 1);
+        if (pieceMoved) {
+            setTurns(prev => prev + 1);
+        }
     } else if (validMove === true) {
         if (isPromotionMove(currentPiece, newX)) {
             setPromotionPending({
@@ -121,6 +125,9 @@ const handleValidMove = (
                 newX,
                 newY,
             });
+            if (pieceMoved) {
+                setTurns(prev => prev + 1);
+            }
         } else {
             const isEnPassantMove = enPassant(
                 activePieceCoords.x,
@@ -137,12 +144,14 @@ const handleValidMove = (
                     prevPieces, 
                     activePieceCoords, 
                     newX, 
-                    newY, 
+                    newY,
                     currentPiece, 
                     isEnPassantMove
                 )
             );
-            setTurns(prev => prev + 1);
+            if (pieceMoved) {
+                setTurns(prev => prev + 1);
+            }
         }
     }
 };

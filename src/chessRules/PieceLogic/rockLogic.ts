@@ -1,6 +1,7 @@
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
 import { isCellAccessible, isCellOccupiedByMe } from '../utills';
+import { wouldKingBeInCheck } from './kingProtection';
 
 const rookLogic = (
     team: Teams,
@@ -47,6 +48,8 @@ const rookLogic = (
         const rock = board.find(
             (p) => p.x === prevX && p.y === prevY && p.type === 'ROCK'
         );
+            if (wouldKingBeInCheck(prevX, prevY, newX, newY, team, board))
+                return false
         if (rock) rock.isRookMoving = true;
         return true;
     }

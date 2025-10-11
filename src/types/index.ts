@@ -18,6 +18,8 @@ export interface Pieces {
 }
 
 export interface Props {
+    setCheckmate: React.Dispatch<React.SetStateAction<boolean>>;
+    checkmate: boolean;
     pieces: Pieces[];
     setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
     setPromotionPending: (

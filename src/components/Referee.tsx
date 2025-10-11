@@ -5,9 +5,11 @@ import Board from './Board';
 import { Piece } from '../utils';
 import type { PieceType } from '../types/enums';
 import { initBoard } from '../utils/initBoard';
+import CheckMate from './CheckMate';
 
 export default function Referee({}) {
     const [pieces, setPieces] = useState<Pieces[]>(initBoard);
+    const [checkMate, setCheckMate] = useState(false);
     const [promotionPending, setPromotionPending] = useState<{
         piece: Pieces;
         newX: number;
@@ -72,10 +74,13 @@ export default function Referee({}) {
 
     return (
         <>
+        {checkMate && <CheckMate />}
             <Board
                 pieces={pieces}
                 setPieces={setPieces}
                 setPromotionPending={setPromotionPending}
+                checkmate={checkMate}
+                setCheckmate={setCheckMate}
             />
             {promotionPending && (
                 <PromotionModal
