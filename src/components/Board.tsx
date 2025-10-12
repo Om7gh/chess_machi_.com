@@ -10,7 +10,6 @@ export default function Board({
     setPieces,
     setPromotionPending,
     checkmate,
-    setCheckmate
 }: Props) {
     const boardRef = useRef<HTMLDivElement | null>(null);
     const [draggablePiece, setDraggablePiece] = useState<HTMLElement | null>(
@@ -36,14 +35,14 @@ export default function Board({
     }
 
     const dragPiece = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (checkmate)
+        if (checkmate.isChekmate)
             return ;
         updateMoves();
         draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords)
     };
 
     const movePiece = (e: React.MouseEvent<HTMLDivElement>) => {
-         if (checkmate)
+         if (checkmate.isChekmate)
             return ;
         const rect = boardRef.current?.getBoundingClientRect();
         if (draggablePiece && rect) {
@@ -56,7 +55,7 @@ export default function Board({
     };
 
     const dropPiece = (e: React.MouseEvent<HTMLDivElement>) => {
-         if (checkmate)
+         if (checkmate.isChekmate)
             return ;
         if (!draggablePiece || !activePieceCoords) {
         return resetDraggablePiece();
@@ -110,6 +109,7 @@ export default function Board({
     };
 
     const boardTiles = boardTile({pieces, activePieceCoords, turns});
+
     return (
         <div
             ref={boardRef}

@@ -1,20 +1,44 @@
-import { useState } from 'react';
-import type { Pieces } from '../types';
+import { useCallback, useEffect, useState } from 'react';
+import type { CheckMateProps, Pieces } from '../types';
 import PromotionModal from '../utils/PromotionModel';
 import Board from './Board';
 import { Piece } from '../utils';
 import type { PieceType } from '../types/enums';
 import { initBoard } from '../utils/initBoard';
 import CheckMate from './CheckMate';
+import { isKingInCheck } from '../chessRules/PieceLogic/kingLogic';
+
 
 export default function Referee({}) {
     const [pieces, setPieces] = useState<Pieces[]>(initBoard);
-    const [checkMate, setCheckMate] = useState(false);
+    const [checkMate, setCheckMate] = useState<CheckMateProps>({isChekmate: false, winner: null});
     const [promotionPending, setPromotionPending] = useState<{
         piece: Pieces;
         newX: number;
         newY: number;
     } | null>(null);
+
+    const checkForCheckmate = useCallback((board: Pieces[]) => {
+      const allPiecesHaveMoves = board.every((p) => p.possibleMoves !== undefined);
+      if (!allPiecesHaveMoves) return;
+
+      const opponentPieces = board.filter((p) => p.team === "OPPONENT");
+      const myPieces = board.filter((p) => p.team === "ME");
+      const oppKing = opponentPieces.find(p => p.type === "KING");
+      const myKing = myPieces.find(p => p.type === "KING");
+
+      const opponentHasMove = opponentPieces.some((p) => p.possibleMoves?.length);
+      const myHasMove = myPieces.some((p) => p.possibleMoves?.length);
+
+      if (oppKing && !opponentHasMove && isKingInCheck(oppKing.team, board, oppKing.x, oppKing.y))
+        setCheckMate({ isChekmate: true, winner: "WHITE" });
+      else if (myKing && !myHasMove && isKingInCheck(myKing.team, board, myKing.x, myKing.y))
+        setCheckMate({ isChekmate: true, winner: "BLACK" });
+    }, [setCheckMate]);
+
+    useEffect(() => {
+      checkForCheckmate(pieces);
+    }, [pieces, checkForCheckmate]);
 
     const handlePromotion = (promotionType: PieceType) => {
         if (!promotionPending) return;
@@ -74,13 +98,13 @@ export default function Referee({}) {
 
     return (
         <>
-        {checkMate && <CheckMate />}
+        {checkMate.isChekmate && <CheckMate winner={checkMate.winner}  />}
             <Board
                 pieces={pieces}
                 setPieces={setPieces}
                 setPromotionPending={setPromotionPending}
                 checkmate={checkMate}
-                setCheckmate={setCheckMate}
+                checkForCheckmate={checkForCheckmate}
             />
             {promotionPending && (
                 <PromotionModal

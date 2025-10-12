@@ -15,14 +15,21 @@ export interface Pieces {
     isKingMoving?: boolean | undefined;
     isRookMoving?: boolean | undefined;
     possibleMoves?: Position[] | undefined;
+    isCheckMate?: boolean | undefined;
 }
 
+
 export interface Props {
-    setCheckmate: React.Dispatch<React.SetStateAction<boolean>>;
-    checkmate: boolean;
+    checkForCheckmate: (board: Pieces[]) => void;
+    checkmate: CheckMateProps;
     pieces: Pieces[];
     setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
     setPromotionPending: (
         promotion: { piece: Pieces; newX: number; newY: number } | null
     ) => void;
+}
+
+export interface CheckMateProps {
+    isChekmate: boolean;
+    winner: "WHITE" | "BLACK" | null
 }

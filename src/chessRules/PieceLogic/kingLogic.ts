@@ -23,24 +23,10 @@ const kingLogic = (
     }
 
    if (isCellOccupiedByOpponent(newX, newY, board, team)) {
-        const opponentTeam = team === 'ME' ? 'OPPONENT' : 'ME';
-        const opponentPieces = board.filter(p => p.team === opponentTeam);
-
-        for (const piece of opponentPieces) {
-            if (!piece.possibleMoves)
-                continue;
-
-            for (const move of piece.possibleMoves) {
-                if (move.x === newX && move.y === newY && piece.x !== newX && piece.y !== newY) {
-                    return false;
-                }
-            }
-        }
+        if (wouldKingBeInCheck(prevX, prevY, newX, newY, team, board))
+        return false
     }
 
-    if (wouldKingBeInCheck(prevX, prevY, newX, newY, team, board))
-        return false
-     
     if (isKingInCheck(team, board, newX, newY))
         return false;
 

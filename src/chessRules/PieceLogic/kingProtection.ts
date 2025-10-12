@@ -21,7 +21,6 @@ const wouldKingBeInCheck = (
     }).filter(Boolean) as Pieces[];
 
     const boardWithUpdatedMoves = updatePossibleMoves(tempBoard);
-    
     return isKingInCheckWithUpdatedMoves(team, boardWithUpdatedMoves);
 };
 
@@ -65,7 +64,6 @@ const isKingInCheckWithUpdatedMoves = (team: Teams, board: Pieces[]): boolean =>
     if (!king) {
         return false;
     }
-
     const opponentPieces = board.filter(piece => piece.team !== team);
 
     for (const piece of opponentPieces) {

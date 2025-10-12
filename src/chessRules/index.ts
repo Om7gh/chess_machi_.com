@@ -81,8 +81,8 @@ export class ChessRules {
             default:
                 return [];
         }
-
-        return this.filterMovesThatExposeKing(piece, possibleMoves, board);
+        const moves = this.filterMovesThatExposeKing(piece, possibleMoves, board);
+        return moves;
     }
 
     private filterMovesThatExposeKing(
