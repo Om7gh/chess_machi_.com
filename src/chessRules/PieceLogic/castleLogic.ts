@@ -1,6 +1,6 @@
 import type { Pieces } from '../../types';
 import { isCellAccessible } from '../utills';
-import { isKingInCheck } from './kingLogic';
+import { isKingInCheck } from './kingProtection';
 
 const castleLogic = (
     prevX: number,

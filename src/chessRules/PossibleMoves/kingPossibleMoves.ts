@@ -1,5 +1,5 @@
 import type { Pieces, Position } from '../../types';
-import { isKingInCheck } from '../PieceLogic/kingLogic';
+import { isKingInCheck } from '../PieceLogic/kingProtection';
 import { isCellAccessible, isCellOccupiedByOpponent } from '../utills';
 
 export const getKingPossibleMoves = (

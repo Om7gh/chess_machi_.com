@@ -1,6 +1,6 @@
 1 - sync turns in case of piece is moved and not just grap and drop ----> DONE
 2 - check if piece is protecting the king from check dont move it ----> DONE
-3 - if check, only piece who protect king should move or the king
+3 - if check, only piece who protect king should move or the king ---> DONE
 4 - checkmake
 5 - stalemate
 6 - piece not enough for checkmake

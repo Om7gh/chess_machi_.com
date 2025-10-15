@@ -18,9 +18,7 @@ export interface Pieces {
     isCheckMate?: boolean | undefined;
 }
 
-
 export interface Props {
-    checkForCheckmate: (board: Pieces[]) => void;
     checkmate: CheckMateProps;
     pieces: Pieces[];
     setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
@@ -31,5 +29,5 @@ export interface Props {
 
 export interface CheckMateProps {
     isChekmate: boolean;
-    winner: "WHITE" | "BLACK" | null
+    winner: 'WHITE' | 'BLACK' | 'DRAW' | null;
 }

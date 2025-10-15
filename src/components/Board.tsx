@@ -3,7 +3,12 @@ import { useRef, useState } from 'react';
 import { ChessRules } from '../chessRules';
 import { boardTile } from '../utils/boardTiles';
 import { draggableEvent } from '../events';
-import { getBoardCoordinates, getCurrentPiece, handleValidMove, validateTurn } from '../events/dropEvent';
+import {
+    getBoardCoordinates,
+    getCurrentPiece,
+    handleValidMove,
+    validateTurn,
+} from '../events/dropEvent';
 
 export default function Board({
     pieces,
@@ -22,78 +27,6 @@ export default function Board({
     const [turns, setTurns] = useState(1);
     const rules = new ChessRules();
 
-    function updateMoves() {
-        setPieces((prev) => {
-            return prev.map((p) => {
-                const possibleMoves = rules.getPossibleMove(prev, p);
-                return {
-                    ...p,
-                    possibleMoves,
-                };
-            });
-        });
-    }
-
-    const dragPiece = (e: React.MouseEvent<HTMLDivElement>) => {
-        if (checkmate.isChekmate)
-            return ;
-        updateMoves();
-        draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords)
-    };
-
-    const movePiece = (e: React.MouseEvent<HTMLDivElement>) => {
-         if (checkmate.isChekmate)
-            return ;
-        const rect = boardRef.current?.getBoundingClientRect();
-        if (draggablePiece && rect) {
-            const x = e.clientX - rect.left - draggablePiece.offsetWidth / 2;
-            const y = e.clientY - rect.top - draggablePiece.offsetHeight / 2;
-
-            draggablePiece.style.left = `${x}px`;
-            draggablePiece.style.top = `${y}px`;
-        }
-    };
-
-    const dropPiece = (e: React.MouseEvent<HTMLDivElement>) => {
-         if (checkmate.isChekmate)
-            return ;
-        if (!draggablePiece || !activePieceCoords) {
-        return resetDraggablePiece();
-    }
-
-    const boardCoords = getBoardCoordinates(e, boardRef);
-    if (!boardCoords) return resetDraggablePiece();
-
-    const { newX, newY } = boardCoords;
-    const currentPiece = getCurrentPiece(activePieceCoords, pieces);
-    
-    if (!currentPiece) return resetDraggablePiece();
-    if (!validateTurn(currentPiece, turns)) return resetDraggablePiece();
-
-    const validMove = rules.isValid(
-        activePieceCoords.x,
-        activePieceCoords.y,
-        newX,
-        newY,
-        currentPiece.team,
-        currentPiece.type,
-        pieces
-    );
-
-    validMove && handleValidMove(
-        validMove,
-        activePieceCoords,
-        newX,
-        newY,
-        currentPiece,
-        pieces,
-        setPieces,
-        setPromotionPending,
-        setTurns
-    );
-    resetDraggablePiece();
-    };
-
     const resetDraggablePiece = () => {
         if (draggablePiece) {
             draggablePiece.style.position = '';
@@ -108,7 +41,90 @@ export default function Board({
         setActivePieceCoords(null);
     };
 
-    const boardTiles = boardTile({pieces, activePieceCoords, turns});
+    function updateMoves() {
+        setPieces((prev) => {
+            return prev.map((p) => {
+                const possibleMoves = rules.getPossibleMove(prev, p);
+                return {
+                    ...p,
+                    possibleMoves,
+                };
+            });
+        });
+    }
+
+    const dragPiece = (
+        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+    ) => {
+        if (checkmate.isChekmate) return;
+        updateMoves();
+        draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords);
+    };
+
+    const movePiece = (
+        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+    ) => {
+        if (checkmate.isChekmate) return;
+
+        const rect = boardRef.current?.getBoundingClientRect();
+        if (!draggablePiece || !rect) return;
+
+        const { x: clientX, y: clientY } =
+            'touches' in e
+                ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
+                : { x: e.clientX, y: e.clientY };
+
+        const x = clientX - rect.left - draggablePiece.offsetWidth / 2;
+        const y = clientY - rect.top - draggablePiece.offsetHeight / 2;
+
+        draggablePiece.style.left = `${x}px`;
+        draggablePiece.style.top = `${y}px`;
+    };
+
+    const dropPiece = (
+        e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
+    ) => {
+        if (checkmate.isChekmate) return;
+
+        if (!draggablePiece || !activePieceCoords) return resetDraggablePiece();
+
+        const boardCoords = getBoardCoordinates(e, boardRef);
+        if (!boardCoords) return resetDraggablePiece();
+
+        const { newX, newY } = boardCoords;
+        const currentPiece = getCurrentPiece(activePieceCoords, pieces);
+
+        if (!currentPiece || !validateTurn(currentPiece, turns))
+            return resetDraggablePiece();
+
+        const validMove = rules.isValid(
+            activePieceCoords.x,
+            activePieceCoords.y,
+            newX,
+            newY,
+            currentPiece.team,
+            currentPiece.type,
+            pieces
+        );
+
+        if (validMove) {
+            handleValidMove(
+                validMove,
+                activePieceCoords,
+                newX,
+                newY,
+                currentPiece,
+                pieces,
+                setPieces,
+                setPromotionPending,
+                setTurns
+            );
+        }
+
+        resetDraggablePiece();
+    };
+
+    const boardTiles = boardTile({ pieces, activePieceCoords, turns });
 
     return (
         <div
@@ -117,7 +133,10 @@ export default function Board({
             onMouseDown={dragPiece}
             onMouseMove={movePiece}
             onMouseUp={dropPiece}
-            style={{ position: 'relative' }}
+            onTouchStart={dragPiece}
+            onTouchMove={movePiece}
+            onTouchEnd={dropPiece}
+            className="relative"
         >
             {boardTiles}
         </div>

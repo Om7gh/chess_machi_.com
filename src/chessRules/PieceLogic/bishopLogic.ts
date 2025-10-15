@@ -1,7 +1,6 @@
-import type { Pieces } from "../../types";
-import type { Teams } from "../../types/enums";
-import { isCellAccessible, isCellOccupiedByMe } from "../utills";
-import { wouldKingBeInCheck } from "./kingProtection";
+import type { Pieces } from '../../types';
+import type { Teams } from '../../types/enums';
+import { getBishopPossibleMoves } from '../PossibleMoves/bishopPossibleMoves';
 
 const bishopLogic = (
     team: Teams,
@@ -11,24 +10,19 @@ const bishopLogic = (
     newY: number,
     board: Pieces[]
 ) => {
-    const deltaX = Math.abs(newX - prevX);
-    const deltaY = Math.abs(newY - prevY);
+    const bishop = board.find(
+        (p) =>
+            p.type === 'BISHOP' &&
+            p.team === team &&
+            p.x === prevX &&
+            p.y === prevY
+    );
 
-    if (deltaX !== deltaY) return false;
+    if (!bishop) return false;
 
-    const xDirection = newX > prevX ? 1 : -1;
-    const yDirection = newY > prevY ? 1 : -1;
-    for (let i = 1; i < deltaX; i++) {
-        const checkX = prevX + i * xDirection;
-        const checkY = prevY + i * yDirection;
+    const possibleMoves = getBishopPossibleMoves(bishop, board);
 
-        if (!isCellAccessible(checkX, checkY, board)) {
-            return false;
-        }
-    }
-    if (isCellOccupiedByMe(newX, newY, board, team))
-        return !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
-    return false
+    return possibleMoves.some((move) => move.x === newX && move.y === newY);
 };
 
 export { bishopLogic };

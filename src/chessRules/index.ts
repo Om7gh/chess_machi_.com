@@ -81,38 +81,51 @@ export class ChessRules {
             default:
                 return [];
         }
-        const moves = this.filterMovesThatExposeKing(piece, possibleMoves, board);
+        const moves = this.filterMovesThatExposeKing(
+            piece,
+            possibleMoves,
+            board
+        );
         return moves;
     }
 
     private filterMovesThatExposeKing(
-        piece: Pieces, 
-        possibleMoves: Position[], 
+        piece: Pieces,
+        possibleMoves: Position[],
         board: Pieces[]
     ): Position[] {
-        return possibleMoves.filter(move => {
-            const tempBoard = board.map(p => {
-                if (p.x === piece.x && p.y === piece.y) {
-                    return { ...p, x: move.x, y: move.y };
-                }
-                if (p.x === move.x && p.y === move.y && p.team !== piece.team) {
-                    return null;
-                }
-                return p;
-            }).filter(Boolean) as Pieces[];
+        return possibleMoves.filter((move) => {
+            const tempBoard = board
+                .map((p) => {
+                    if (p.x === piece.x && p.y === piece.y) {
+                        return { ...p, x: move.x, y: move.y };
+                    }
+                    if (
+                        p.x === move.x &&
+                        p.y === move.y &&
+                        p.team !== piece.team
+                    ) {
+                        return null;
+                    }
+                    return p;
+                })
+                .filter(Boolean) as Pieces[];
 
             return !this.isKingInCheckAfterMove(piece.team, tempBoard);
         });
     }
 
     private isKingInCheckAfterMove(team: Teams, board: Pieces[]): boolean {
-        const king = board.find(p => p.type === 'KING' && p.team === team);
+        const king = board.find((p) => p.type === 'KING' && p.team === team);
         if (!king) return false;
 
-        const opponentPieces = board.filter(p => p.team !== team);
+        const opponentPieces = board.filter((p) => p.team !== team);
 
         for (const opponentPiece of opponentPieces) {
-            const opponentMoves = this.getBasicPossibleMoves(opponentPiece, board);
+            const opponentMoves = this.getBasicPossibleMoves(
+                opponentPiece,
+                board
+            );
             for (const move of opponentMoves) {
                 if (move.x === king.x && move.y === king.y) {
                     return true;

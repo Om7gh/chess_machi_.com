@@ -1,7 +1,6 @@
-import type { Pieces } from "../../types";
-import type { Teams } from "../../types/enums";
-import { isCellOccupiedByMe } from "../utills";
-import { wouldKingBeInCheck } from "./kingProtection";
+import type { Pieces } from '../../types';
+import type { Teams } from '../../types/enums';
+import { getKnightPossibleMoves } from '../PossibleMoves/knightPossibleMoves';
 
 const knightLogic = (
     team: Teams,
@@ -11,14 +10,19 @@ const knightLogic = (
     newY: number,
     board: Pieces[]
 ) => {
-    const deltaX = Math.abs(newX - prevX);
-    const deltaY = Math.abs(newY - prevY);
+    const knight = board.find(
+        (p) =>
+            p.type === 'KNIGHT' &&
+            p.team === team &&
+            p.x === prevX &&
+            p.y === prevY
+    );
 
-    if ((deltaX === 2 && deltaY === 1) || (deltaX === 1 && deltaY === 2)) {
-          if (isCellOccupiedByMe(newX, newY, board, team))
-            return !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
-    }
-    return false;
+    if (!knight) return false;
+
+    const possibleMoves = getKnightPossibleMoves(knight, board);
+
+    return possibleMoves.some((move) => move.x === newX && move.y === newY);
 };
 
 export { knightLogic };
