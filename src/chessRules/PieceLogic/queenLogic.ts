@@ -1,6 +1,7 @@
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
 import { getQueenPossibleMoves } from '../PossibleMoves/queenPossibleMoves';
+import { wouldKingBeInCheck } from './kingProtection';
 
 const queenLogic = (
     team: Teams,
@@ -22,7 +23,10 @@ const queenLogic = (
 
     const possibleMoves = getQueenPossibleMoves(queen, board);
 
-    return possibleMoves.some((move) => move.x === newX && move.y === newY);
+    return (
+        possibleMoves.some((move) => move.x === newX && move.y === newY) &&
+        !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
+    );
 };
 
 export { queenLogic };

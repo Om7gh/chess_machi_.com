@@ -1,6 +1,7 @@
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
 import { getBishopPossibleMoves } from '../PossibleMoves/bishopPossibleMoves';
+import { wouldKingBeInCheck } from './kingProtection';
 
 const bishopLogic = (
     team: Teams,
@@ -22,7 +23,10 @@ const bishopLogic = (
 
     const possibleMoves = getBishopPossibleMoves(bishop, board);
 
-    return possibleMoves.some((move) => move.x === newX && move.y === newY);
+    return (
+        possibleMoves.some((move) => move.x === newX && move.y === newY) &&
+        !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
+    );
 };
 
 export { bishopLogic };

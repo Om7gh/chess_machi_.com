@@ -1,6 +1,7 @@
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
 import { getRockPossibleMoves } from '../PossibleMoves/rockPossibleMoves';
+import { wouldKingBeInCheck } from './kingProtection';
 
 const rookLogic = (
     team: Teams,
@@ -22,7 +23,10 @@ const rookLogic = (
 
     const possibleMoves = getRockPossibleMoves(rock, board);
 
-    return possibleMoves.some((move) => move.x === newX && move.y === newY);
+    return (
+        possibleMoves.some((move) => move.x === newX && move.y === newY) &&
+        !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
+    );
 };
 
 export { rookLogic };

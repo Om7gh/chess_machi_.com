@@ -1,6 +1,7 @@
 import type { Pieces } from '../../types';
 import type { PieceType, Teams } from '../../types/enums';
 import { getPawnPossibleMoves } from '../PossibleMoves/pawnPossibleMoves';
+import { wouldKingBeInCheck } from './kingProtection';
 
 const pawnLogic = (
     team: Teams,
@@ -20,7 +21,10 @@ const pawnLogic = (
 
     const possibleMoves = getPawnPossibleMoves(pawn, board);
 
-    return possibleMoves.some((move) => move.x === newX && move.y === newY);
+    return (
+        possibleMoves.some((move) => move.x === newX && move.y === newY) &&
+        !wouldKingBeInCheck(prevX, prevY, newX, newY, team, board)
+    );
 };
 
 export { pawnLogic };
