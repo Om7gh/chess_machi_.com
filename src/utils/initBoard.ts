@@ -11,7 +11,7 @@ const initBoard = () => {
             image: Piece('wP'),
             x: 1,
             y: i,
-            team: Teams.ME,
+            team: Teams.WHITE,
             type: PieceType.PAWN,
         });
     }
@@ -21,7 +21,7 @@ const initBoard = () => {
             image: Piece('bP'),
             x: 6,
             y: i,
-            team: Teams.OPPONENT,
+            team: Teams.BLACK,
             type: PieceType.PAWN,
         });
     }

@@ -15,7 +15,7 @@ const PromotionModal = ({
         PieceType.KNIGHT,
     ];
 
-    const teamType = team === 'ME' ? 0 : 1;
+    const teamType = team === 'WHITE' ? 0 : 1;
 
     return (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-slate-900/50 backdrop-blur-sm flex justify-center items-center z-50 w-full m-auto">

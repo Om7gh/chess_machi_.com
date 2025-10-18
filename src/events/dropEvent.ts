@@ -2,8 +2,10 @@ import { enPassant } from '../chessRules/PieceLogic/enPassant';
 import type { Pieces } from '../types';
 
 const getBoardCoordinates = (
-    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
-    boardRef: React.RefObject<HTMLDivElement | null>
+    e:
+        | React.MouseEvent<HTMLDivEleWHITEnt>
+        | React.TouchEvent<HTMLDivEleWHITEnt>,
+    boardRef: React.RefObject<HTMLDivEleWHITEnt | null>
 ): { newX: number; newY: number; tileSize: number } | null => {
     const rect = boardRef.current?.getBoundingClientRect();
     if (!rect) return null;
@@ -45,8 +47,8 @@ const getCurrentPiece = (
 const validateTurn = (currentPiece: Pieces | null, turns: number): boolean => {
     if (!currentPiece) return false;
 
-    if (currentPiece.team === 'ME' && turns % 2 === 0) return false;
-    if (currentPiece.team === 'OPPONENT' && turns % 2 === 1) return false;
+    if (currentPiece.team === 'WHITE' && turns % 2 === 0) return false;
+    if (currentPiece.team === 'BLACK' && turns % 2 === 1) return false;
 
     return true;
 };
@@ -54,8 +56,8 @@ const validateTurn = (currentPiece: Pieces | null, turns: number): boolean => {
 const isPromotionMove = (currentPiece: Pieces, newX: number): boolean => {
     return (
         currentPiece.type === 'PAWN' &&
-        ((currentPiece.team === 'ME' && newX === 7) ||
-            (currentPiece.team === 'OPPONENT' && newX === 0))
+        ((currentPiece.team === 'WHITE' && newX === 7) ||
+            (currentPiece.team === 'BLACK' && newX === 0))
     );
 };
 

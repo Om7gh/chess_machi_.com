@@ -1,6 +1,6 @@
-import type { Pieces } from "../../types";
-import type { PieceType, Teams } from "../../types/enums";
-import { isCellAccessible } from "../utills";
+import type { Pieces } from '../../types';
+import type { PieceType, Teams } from '../../types/enums';
+import { isCellAccessible } from '../utills';
 
 const enPassant = (
     prevX: number,
@@ -13,7 +13,7 @@ const enPassant = (
 ): boolean => {
     if (type !== 'PAWN') return false;
 
-    const direction = team === 'ME' ? 1 : -1;
+    const direction = team === 'WHITE' ? 1 : -1;
 
     if (newX === prevX + direction && Math.abs(newY - prevY) === 1) {
         if (isCellAccessible(newX, newY, board)) {

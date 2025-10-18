@@ -15,7 +15,7 @@ export const pushRocks = (piece: Pieces[]) => {
         image: Piece('wR'),
         x: 0,
         y: 0,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.ROCK,
         isRookMoving: false,
         isKingMoving: false,
@@ -24,7 +24,7 @@ export const pushRocks = (piece: Pieces[]) => {
         image: Piece('wR'),
         x: 0,
         y: 7,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.ROCK,
         isRookMoving: false,
         isKingMoving: false,
@@ -33,7 +33,7 @@ export const pushRocks = (piece: Pieces[]) => {
         image: Piece('bR'),
         x: 7,
         y: 0,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.ROCK,
         isRookMoving: false,
         isKingMoving: false,
@@ -42,7 +42,7 @@ export const pushRocks = (piece: Pieces[]) => {
         image: Piece('bR'),
         x: 7,
         y: 7,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.ROCK,
         isRookMoving: false,
         isKingMoving: false,
@@ -54,28 +54,28 @@ export const pushKnight = (piece: Pieces[]) => {
         image: Piece('wN'),
         x: 0,
         y: 1,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.KNIGHT,
     });
     piece.push({
         image: Piece('wN'),
         x: 0,
         y: 6,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.KNIGHT,
     });
     piece.push({
         image: Piece('bN'),
         x: 7,
         y: 1,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.KNIGHT,
     });
     piece.push({
         image: Piece('bN'),
         x: 7,
         y: 6,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.KNIGHT,
     });
 };
@@ -85,28 +85,28 @@ export const pushPishop = (piece: Pieces[]) => {
         image: Piece('wB'),
         x: 0,
         y: 2,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.BISHOP,
     });
     piece.push({
         image: Piece('wB'),
         x: 0,
         y: 5,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.BISHOP,
     });
     piece.push({
         image: Piece('bB'),
         x: 7,
         y: 2,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.BISHOP,
     });
     piece.push({
         image: Piece('bB'),
         x: 7,
         y: 5,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.BISHOP,
     });
 };
@@ -116,34 +116,34 @@ export const pushKQ = (piece: Pieces[]) => {
         image: Piece('wQ'),
         x: 0,
         y: 3,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.QUEEN,
     });
     piece.push({
         image: Piece('wK'),
         x: 0,
         y: 4,
-        team: Teams.ME,
+        team: Teams.WHITE,
         type: PieceType.KING,
         isRookMoving: false,
         isKingMoving: false,
-        isCheckMate: false
+        isCheckMate: false,
     });
     piece.push({
         image: Piece('bQ'),
         x: 7,
         y: 3,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.QUEEN,
     });
     piece.push({
         image: Piece('bK'),
         x: 7,
         y: 4,
-        team: Teams.OPPONENT,
+        team: Teams.BLACK,
         type: PieceType.KING,
         isRookMoving: false,
         isKingMoving: false,
-        isCheckMate: false
+        isCheckMate: false,
     });
 };

@@ -8,8 +8,8 @@ enum PieceType {
 }
 
 enum Teams {
-    OPPONENT = 'OPPONENT',
-    ME = 'ME',
+    BLACK = 'BLACK',
+    WHITE = 'WHITE',
 }
 
 export { PieceType, Teams };

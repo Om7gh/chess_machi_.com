@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 
-export default function TimerCustomization({
-    setGameTimer,
+export default function TiWHITErCustomization({
+    setGaWHITETiWHITEr,
 }: {
-    setGameTimer: React.Dispatch<React.SetStateAction<string>>;
+    setGaWHITETiWHITEr: React.Dispatch<React.SetStateAction<string>>;
 }) {
-    const [activeTime, setActiveTime] = useState<number | null>(null);
-    const times = [60, 180, 300, 600, 900];
+    const [activeTiWHITE, setActiveTiWHITE] = useState<number | null>(null);
+    const tiWHITEs = [60, 180, 300, 600, 900];
 
-    const convertToTime = (time: number) => {
-        const minutes = Math.floor(time / 60);
-        const seconds = time % 60;
+    const convertToTiWHITE = (tiWHITE: number) => {
+        const minutes = Math.floor(tiWHITE / 60);
+        const seconds = tiWHITE % 60;
         return `${minutes}:${seconds.toString().padStart(2, '0')}`;
     };
 
@@ -22,17 +22,19 @@ export default function TimerCustomization({
 
     return (
         <div className="bg-slate-800/50 p-5 rounded-lg flex flex-col gap-2">
-            <h2 className="text-xl text-center mb-2">Time Customization</h2>
-            {times.map((time) => (
+            <h2 className="text-xl text-center mb-2">TiWHITE Customization</h2>
+            {tiWHITEs.map((tiWHITE) => (
                 <button
-                    key={time}
+                    key={tiWHITE}
                     onClick={() => {
-                        setGameTimer(convertToTime(time));
-                        setActiveTime(time);
+                        setGaWHITETiWHITEr(convertToTiWHITE(tiWHITE));
+                        setActiveTiWHITE(tiWHITE);
                     }}
-                    className={activeTime === time ? activeStyle : baseStyle}
+                    className={
+                        activeTiWHITE === tiWHITE ? activeStyle : baseStyle
+                    }
                 >
-                    {convertToTime(time)}
+                    {convertToTiWHITE(tiWHITE)}
                 </button>
             ))}
         </div>

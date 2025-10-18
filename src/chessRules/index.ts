@@ -119,14 +119,11 @@ export class ChessRules {
         const king = board.find((p) => p.type === 'KING' && p.team === team);
         if (!king) return false;
 
-        const opponentPieces = board.filter((p) => p.team !== team);
+        const BLACKPieces = board.filter((p) => p.team !== team);
 
-        for (const opponentPiece of opponentPieces) {
-            const opponentMoves = this.getBasicPossibleMoves(
-                opponentPiece,
-                board
-            );
-            for (const move of opponentMoves) {
+        for (const BLACKPiece of BLACKPieces) {
+            const BLACKMoves = this.getBasicPossibleMoves(BLACKPiece, board);
+            for (const move of BLACKMoves) {
                 if (move.x === king.x && move.y === king.y) {
                     return true;
                 }

@@ -1,6 +1,6 @@
 import type { Props } from '../types';
 import { useRef, useState } from 'react';
-import { ChessRules } from '../chessRules';
+import { ChessRules } from '../classes/chessRules';
 import { boardTile } from '../utils/boardTiles';
 import { draggableEvent } from '../events';
 import {
@@ -56,7 +56,7 @@ export default function Board({
     const dragPiece = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
-        if (checkmate.isChekmate) return;
+        if (checkmate.isCheckmate) return;
         updateMoves();
         draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords);
     };
@@ -64,7 +64,7 @@ export default function Board({
     const movePiece = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
-        if (checkmate.isChekmate) return;
+        if (checkmate.isCheckmate) return;
 
         const rect = boardRef.current?.getBoundingClientRect();
         if (!draggablePiece || !rect) return;
@@ -84,7 +84,7 @@ export default function Board({
     const dropPiece = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
-        if (checkmate.isChekmate) return;
+        if (checkmate.isCheckmate) return;
 
         if (!draggablePiece || !activePieceCoords) return resetDraggablePiece();
 
