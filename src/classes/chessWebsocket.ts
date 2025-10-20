@@ -9,6 +9,9 @@ type WebSocketMessage = {
     text?: string;
 };
 
+type ClientMessage = { type: 'create' | 'join' | 'syncBoard' | 'chat' };
+type ServerMessage = { type: 'roomCreated' | 'gameStart' | 'boardUpdate' };
+
 class ChessWebSocket {
     private ws: WebSocket | null = null;
     private roomId: string | null = null;
@@ -62,9 +65,15 @@ class ChessWebSocket {
         }
     }
 
-    // sendChat(text: string) {
-    //     this.send({ type: 'chat', text });
-    // } machi db
+    reconnect(url: string) {
+        if (!this.roomId) return;
+        this.connect(url);
+        this.joinRoom(this.roomId);
+    }
+
+    sendChat(text: string) {
+        this.send({ type: 'chat', text });
+    }
 
     on(event: string, handler: Function) {
         if (!this.messageHandlers.has(event)) {
@@ -106,11 +115,14 @@ class ChessWebSocket {
                 break;
             case 'gameStart':
                 this.myTeam = message.yourTeam;
+                this.roomId = message.roomId;
                 this.emit('gameStart', {
                     myTeam: message.yourTeam,
                     opponentConnected: true,
+                    roomId: message.roomId,
                 });
                 break;
+
             case 'syncBoard':
                 this.emit('boardUpdate', {
                     board: message.board,
@@ -119,13 +131,13 @@ class ChessWebSocket {
                     fromPlayer: message.fromPlayer,
                 });
                 break;
-            // case 'chatMessage':
-            //     this.emit('chatMessage', {
-            //         from: message.from,
-            //         text: message.text,
-            //         timestamp: message.timestamp,
-            //     });
-            //     break;
+            case 'chatMessage':
+                this.emit('chatMessage', {
+                    from: message.from,
+                    text: message.text,
+                    timestamp: message.timestamp,
+                });
+                break;
             case 'opponentDisconnected':
                 this.emit('opponentDisconnected');
                 break;

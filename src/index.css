@@ -1,9 +1,5 @@
 @import 'tailwindcss';
 
-* {
-    user-select: none;
-}
-
 .App {
     background-image: url(../public/assets/bg1.png);
     background-repeat: no-repeat;

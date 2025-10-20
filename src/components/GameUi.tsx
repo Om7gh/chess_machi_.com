@@ -1,29 +1,9 @@
 // src/components/Referee/GameUI.tsx
 
-import type { CheckMateProps, Pieces } from '../types';
-import type { PieceType } from '../types/enums';
+import type { GameUIProps } from '../types';
 import Board from './Board';
 import CheckMate from './CheckMate';
 import PromotionModal from './PromotionModel';
-
-interface GameUIProps {
-    pieces: Pieces[];
-    setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
-    checkMate: CheckMateProps;
-    promotionPending: {
-        piece: Pieces;
-        newX: number;
-        newY: number;
-    } | null;
-    setPromotionPending: React.Dispatch<
-        React.SetStateAction<{
-            piece: Pieces;
-            newX: number;
-            newY: number;
-        } | null>
-    >;
-    handlePromotion: (type: PieceType) => void;
-}
 
 export default function GameUI({
     pieces,
@@ -32,6 +12,8 @@ export default function GameUI({
     promotionPending,
     setPromotionPending,
     handlePromotion,
+    syncBoard,
+    myTeam,
 }: GameUIProps) {
     return (
         <>
