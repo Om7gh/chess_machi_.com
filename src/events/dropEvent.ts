@@ -2,10 +2,8 @@ import { enPassant } from '../chessRules/PieceLogic/enPassant';
 import type { Pieces } from '../types';
 
 const getBoardCoordinates = (
-    e:
-        | React.MouseEvent<HTMLDivEleWHITEnt>
-        | React.TouchEvent<HTMLDivEleWHITEnt>,
-    boardRef: React.RefObject<HTMLDivEleWHITEnt | null>
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+    boardRef: React.RefObject<HTMLDivElement | null>
 ): { newX: number; newY: number; tileSize: number } | null => {
     const rect = boardRef.current?.getBoundingClientRect();
     if (!rect) return null;
@@ -130,7 +128,15 @@ const handleValidMove = (
             newY: number;
         } | null
     ) => void,
-    setTurns: (updater: (prev: number) => number) => void
+    setTurns: () => void,
+    syncBoard: (
+        board: Pieces[],
+        currentTurn: 'WHITE' | 'BLACK',
+        turns: number
+    ) => void,
+    setCurrentTurn: () => void,
+    currentTurn: 'WHITE' | 'BLACK',
+    turns: number
 ): void => {
     const pieceMoved =
         activePieceCoords.x !== newX || activePieceCoords.y !== newY;
@@ -138,7 +144,9 @@ const handleValidMove = (
     if (Array.isArray(validMove)) {
         setPieces(validMove.map((p) => ({ ...p, isEmpassant: false })));
         if (pieceMoved) {
-            setTurns((prev) => prev + 1);
+            setTurns();
+            setCurrentTurn();
+            syncBoard(pieces, currentTurn, turns);
         }
     } else if (validMove === true) {
         if (isPromotionMove(currentPiece, newX)) {
@@ -148,7 +156,9 @@ const handleValidMove = (
                 newY,
             });
             if (pieceMoved) {
-                setTurns((prev) => prev + 1);
+                setTurns();
+                setCurrentTurn();
+                syncBoard(pieces, currentTurn, turns);
             }
         } else {
             const isEnPassantMove = enPassant(
@@ -172,7 +182,10 @@ const handleValidMove = (
                 )
             );
             if (pieceMoved) {
-                setTurns((prev) => prev + 1);
+                console.log(currentTurn, turns, pieces);
+                setTurns();
+                setCurrentTurn();
+                syncBoard(pieces, currentTurn, turns + 1);
             }
         }
     }

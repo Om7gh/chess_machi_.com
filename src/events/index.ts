@@ -1,13 +1,9 @@
 import React from 'react';
 
 function draggableEvent(
-    e:
-        | React.MouseEvent<HTMLDivEleWHITEnt>
-        | React.TouchEvent<HTMLDivEleWHITEnt>,
-    boardRef: React.RefObject<HTMLDivEleWHITEnt | null>,
-    setDraggablePiece: React.Dispatch<
-        React.SetStateAction<HTMLEleWHITEnt | null>
-    >,
+    e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
+    boardRef: React.RefObject<HTMLDivElement | null>,
+    setDraggablePiece: React.Dispatch<React.SetStateAction<HTMLElement | null>>,
     setActivePieceCoords: React.Dispatch<
         React.SetStateAction<{
             x: number;
@@ -18,7 +14,7 @@ function draggableEvent(
     if ('touches' in e)
         touchEvent(e, boardRef, setDraggablePiece, setActivePieceCoords);
     else {
-        const target = e.target as HTMLEleWHITEnt;
+        const target = e.target as HTMLDivElement;
         const rect = boardRef.current?.getBoundingClientRect();
         if (target.classList.contains('piece') && rect) {
             const tileSize = rect.width / 8;
@@ -44,11 +40,9 @@ function draggableEvent(
 }
 
 function touchEvent(
-    e: React.TouchEvent<HTMLDivEleWHITEnt>,
-    boardRef: React.RefObject<HTMLDivEleWHITEnt | null>,
-    setDraggablePiece: React.Dispatch<
-        React.SetStateAction<HTMLEleWHITEnt | null>
-    >,
+    e: React.TouchEvent<HTMLDivElement>,
+    boardRef: React.RefObject<HTMLDivElement | null>,
+    setDraggablePiece: React.Dispatch<React.SetStateAction<HTMLElement | null>>,
     setActivePieceCoords: React.Dispatch<
         React.SetStateAction<{
             x: number;
@@ -56,7 +50,7 @@ function touchEvent(
         } | null>
     >
 ) {
-    const target = e.touches[0].target as HTMLEleWHITEnt;
+    const target = e.touches[0].target as HTMLDivElement;
     const rect = boardRef.current?.getBoundingClientRect();
 
     if (target.classList.contains('piece') && rect) {

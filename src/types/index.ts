@@ -19,6 +19,13 @@ export interface Pieces {
 }
 
 export interface Props {
+    opponentConnected: boolean;
+    myTeam: 'WHITE' | 'BLACK' | null;
+    syncBoard: (
+        board: Pieces[],
+        currentTurn: 'WHITE' | 'BLACK',
+        turns: number
+    ) => void;
     checkmate: CheckMateProps;
     pieces: Pieces[];
     setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
@@ -33,6 +40,7 @@ export interface CheckMateProps {
 }
 
 export interface GameUIProps {
+    opponentConnected: boolean;
     myTeam: 'WHITE' | 'BLACK' | null;
     syncBoard: (
         board: Pieces[],

@@ -63,7 +63,11 @@ export default function App() {
                                     ? '✅ Connected'
                                     : '⌛ Waiting...'}
                             </p>
-                            <Referee myTeam={myTeam} syncBoard={syncBoard} />
+                            <Referee
+                                myTeam={myTeam}
+                                syncBoard={syncBoard}
+                                opponentConnected={opponentConnected}
+                            />
                         </div>
                     )}
                 </div>

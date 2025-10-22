@@ -8,6 +8,7 @@ import GameUI from './GameUi';
 export default function Referee({
     myTeam,
     syncBoard,
+    opponentConnected,
 }: {
     myTeam: 'WHITE' | 'BLACK' | null;
     syncBoard: (
@@ -15,8 +16,9 @@ export default function Referee({
         currentTurn: 'WHITE' | 'BLACK',
         turns: number
     ) => void;
+    opponentConnected: boolean;
 }) {
-    const [pieces, setPieces] = useState<Pieces[]>(initBoard);
+    const [pieces, setPieces] = useState<Pieces[]>(initBoard(myTeam));
     const checkMate = useCheckmate(pieces);
     const { promotionPending, setPromotionPending, handlePromotion } =
         usePromotion(setPieces);
@@ -32,6 +34,7 @@ export default function Referee({
                 handlePromotion={handlePromotion}
                 syncBoard={syncBoard}
                 myTeam={myTeam}
+                opponentConnected={opponentConnected}
             />
         </>
     );

@@ -14,6 +14,7 @@ export default function GameUI({
     handlePromotion,
     syncBoard,
     myTeam,
+    opponentConnected,
 }: GameUIProps) {
     return (
         <>
@@ -23,6 +24,9 @@ export default function GameUI({
                 setPieces={setPieces}
                 setPromotionPending={setPromotionPending}
                 checkmate={checkMate}
+                syncBoard={syncBoard}
+                myTeam={myTeam}
+                opponentConnected={opponentConnected}
             />
             {promotionPending && (
                 <PromotionModal

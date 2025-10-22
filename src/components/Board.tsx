@@ -1,5 +1,5 @@
-import type { Props } from '../types';
-import { useRef, useState } from 'react';
+import type { BoardUpdateData, Props } from '../types';
+import { useEffect, useRef, useState } from 'react';
 import { ChessRules } from '../classes/chessRules';
 import { boardTile } from '../utils/boardTiles';
 import { draggableEvent } from '../events';
@@ -9,13 +9,18 @@ import {
     handleValidMove,
     validateTurn,
 } from '../events/dropEvent';
+import { useChessStore } from '../store/useChessStore';
 
 export default function Board({
     pieces,
     setPieces,
     setPromotionPending,
     checkmate,
+    syncBoard,
+    opponentConnected,
 }: Props) {
+    const currentTurn = useChessStore((state) => state.currentTurn);
+    const setCurrentTurn = useChessStore((state) => state.setCurrentTurn);
     const boardRef = useRef<HTMLDivElement | null>(null);
     const [draggablePiece, setDraggablePiece] = useState<HTMLElement | null>(
         null
@@ -24,7 +29,8 @@ export default function Board({
         x: number;
         y: number;
     } | null>(null);
-    const [turns, setTurns] = useState(1);
+    const turns = useChessStore((state) => state.turns);
+    const setTurns = useChessStore((state) => state.setTurns);
     const rules = new ChessRules();
 
     const resetDraggablePiece = () => {
@@ -40,6 +46,27 @@ export default function Board({
         setDraggablePiece(null);
         setActivePieceCoords(null);
     };
+
+    useEffect(() => {
+        console.log('updated ');
+        const handleSyncBoard = (event: CustomEvent<BoardUpdateData>) => {
+            const { board, currentTurn, turns } = event.detail;
+            setPieces(board);
+
+            useChessStore.setState({
+                currentTurn,
+                turns,
+            });
+        };
+        window.addEventListener('syncBoard', handleSyncBoard as EventListener);
+
+        return () => {
+            window.removeEventListener(
+                'syncBoard',
+                handleSyncBoard as EventListener
+            );
+        };
+    }, [setPieces]);
 
     function updateMoves() {
         setPieces((prev) => {
@@ -117,10 +144,13 @@ export default function Board({
                 pieces,
                 setPieces,
                 setPromotionPending,
-                setTurns
+                setTurns,
+                syncBoard,
+                setCurrentTurn,
+                currentTurn,
+                turns
             );
         }
-
         resetDraggablePiece();
     };
 
