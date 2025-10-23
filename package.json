@@ -1,5 +1,5 @@
 {
-    "naWHITE": "chess",
+    "name": "chess",
     "version": "1.0.0",
     "main": "index.js",
     "scripts": {
@@ -23,7 +23,7 @@
         "react-router-dom": "^7.9.1",
         "react-toastify": "^11.0.5",
         "tailwindcss": "^4.1.13",
-        "vite": "^7.1.7",
+        "vite": "^7.1.12",
         "vite-plugin-eslint": "^1.8.1",
         "zustand": "^5.0.8"
     }

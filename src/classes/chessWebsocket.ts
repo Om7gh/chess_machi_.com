@@ -9,9 +9,6 @@ type WebSocketMessage = {
     text?: string;
 };
 
-type ClientMessage = { type: 'create' | 'join' | 'syncBoard' | 'chat' };
-type ServerMessage = { type: 'roomCreated' | 'gameStart' | 'boardUpdate' };
-
 class ChessWebSocket {
     private ws: WebSocket | null = null;
     private roomId: string | null = null;
@@ -30,6 +27,7 @@ class ChessWebSocket {
             try {
                 const message = JSON.parse(event.data);
                 this.handleMessage(message);
+
             } catch (error) {
                 console.error('Message format is not correct:', error);
             }

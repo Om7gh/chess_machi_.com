@@ -142,11 +142,12 @@ const handleValidMove = (
         activePieceCoords.x !== newX || activePieceCoords.y !== newY;
 
     if (Array.isArray(validMove)) {
-        setPieces(validMove.map((p) => ({ ...p, isEmpassant: false })));
+        const newPieces = validMove.map((p) => ({ ...p, isEmpassant: false })) as Pieces[];
+        setPieces(newPieces);
         if (pieceMoved) {
             setTurns();
             setCurrentTurn();
-            syncBoard(pieces, currentTurn, turns);
+            syncBoard(newPieces, currentTurn, turns + 1);
         }
     } else if (validMove === true) {
         if (isPromotionMove(currentPiece, newX)) {
@@ -155,11 +156,6 @@ const handleValidMove = (
                 newX,
                 newY,
             });
-            if (pieceMoved) {
-                setTurns();
-                setCurrentTurn();
-                syncBoard(pieces, currentTurn, turns);
-            }
         } else {
             const isEnPassantMove = enPassant(
                 activePieceCoords.x,
@@ -171,21 +167,20 @@ const handleValidMove = (
                 currentPiece.type
             );
 
-            setPieces((prevPieces) =>
-                updatePiecesForMove(
-                    prevPieces,
-                    activePieceCoords,
-                    newX,
-                    newY,
-                    currentPiece,
-                    isEnPassantMove
-                )
-            );
+            const newPieces = updatePiecesForMove(
+                pieces,
+                activePieceCoords,
+                newX,
+                newY,
+                currentPiece,
+                isEnPassantMove
+            ) as Pieces[];
+
+            setPieces(newPieces);
             if (pieceMoved) {
-                console.log(currentTurn, turns, pieces);
                 setTurns();
                 setCurrentTurn();
-                syncBoard(pieces, currentTurn, turns + 1);
+                syncBoard(newPieces, currentTurn, turns + 1);
             }
         }
     }

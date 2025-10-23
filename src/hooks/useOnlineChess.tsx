@@ -55,6 +55,7 @@ export function useOnlineChess() {
         );
 
         chessSocket.on('boardUpdate', (data: BoardUpdateData) => {
+            console.log("data", data)
             window.dispatchEvent(
                 new CustomEvent('syncBoard', { detail: data })
             );

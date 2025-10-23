@@ -48,9 +48,9 @@ export default function Board({
     };
 
     useEffect(() => {
-        console.log('updated ');
         const handleSyncBoard = (event: CustomEvent<BoardUpdateData>) => {
             const { board, currentTurn, turns } = event.detail;
+            console.log(event.detail)
             setPieces(board);
 
             useChessStore.setState({
@@ -83,7 +83,7 @@ export default function Board({
     const dragPiece = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
-        if (checkmate.isCheckmate) return;
+        if (checkmate.isCheckmate || !opponentConnected) return;
         updateMoves();
         draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords);
     };
@@ -91,7 +91,7 @@ export default function Board({
     const movePiece = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
-        if (checkmate.isCheckmate) return;
+        if (checkmate.isCheckmate || !opponentConnected) return;
 
         const rect = boardRef.current?.getBoundingClientRect();
         if (!draggablePiece || !rect) return;
@@ -111,7 +111,7 @@ export default function Board({
     const dropPiece = (
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
-        if (checkmate.isCheckmate) return;
+        if (checkmate.isCheckmate || !opponentConnected) return;
 
         if (!draggablePiece || !activePieceCoords) return resetDraggablePiece();
 
