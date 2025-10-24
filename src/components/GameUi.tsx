@@ -1,4 +1,3 @@
-// src/components/Referee/GameUI.tsx
 
 import type { GameUIProps } from '../types';
 import Board from './Board';
@@ -18,7 +17,7 @@ export default function GameUI({
 }: GameUIProps) {
     return (
         <>
-            {checkMate.isCheckmate && <CheckMate winner={checkMate.winner} />}
+            {checkMate.isCheckmate && <CheckMate winner={checkMate.winner} myTeam={myTeam} />}
             <Board
                 pieces={pieces}
                 setPieces={setPieces}

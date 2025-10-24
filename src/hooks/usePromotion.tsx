@@ -2,22 +2,28 @@ import { useState } from 'react';
 import type { Pieces } from '../types';
 import type { PieceType } from '../types/enums';
 import { Piece } from '../utils';
+import { useChessStore } from '../store/useChessStore';
 
 export function usePromotion(
-    setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>
+    setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>,
+    syncBoard : (board: Pieces[], currentTurn: "WHITE" | "BLACK", turns: number) => void
 ) {
     const [promotionPending, setPromotionPending] = useState<{
         piece: Pieces;
         newX: number;
         newY: number;
     } | null>(null);
+    const turns = useChessStore(state => state.turns)
+    const currentTeam = useChessStore(state => state.currentTurn)
+    const setTurns = useChessStore(state => state.setTurns)
+    const setCurrentTurn = useChessStore(state => state.setCurrentTurn)
 
     const handlePromotion = (promotionType: PieceType) => {
         if (!promotionPending) return;
         const { piece, newX, newY } = promotionPending;
 
         setPieces((prevPieces) => {
-            const updatedPieces = prevPieces
+            const base = prevPieces
                 .map((p) => ({ ...p, isEmpassant: false }))
                 .filter((p) => {
                     if (p.x === piece.x && p.y === piece.y) return false;
@@ -30,7 +36,7 @@ export function usePromotion(
             let pieceImage;
             switch (promotionType) {
                 case 'QUEEN':
-                    pieceImage = isWhite ? Piece('wQ') : Piece('bQ');
+                    pieceImage = isWhite ? Piece("wQ") : Piece("bQ")
                     break;
                 case 'ROCK':
                     pieceImage = isWhite ? Piece('wR') : Piece('bR');
@@ -46,8 +52,8 @@ export function usePromotion(
                     console.warn('Invalid promotion piece');
             }
 
-            return [
-                ...updatedPieces,
+            const finalPieces: Pieces[] = [
+                ...base,
                 {
                     ...piece,
                     x: newX,
@@ -57,8 +63,13 @@ export function usePromotion(
                     image: pieceImage,
                 } as Pieces,
             ];
-        });
 
+            setTurns();
+            setCurrentTurn();
+            syncBoard(finalPieces, currentTeam, turns + 1);
+
+            return finalPieces;
+        });
         setPromotionPending(null);
     };
 

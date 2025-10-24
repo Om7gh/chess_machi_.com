@@ -21,7 +21,7 @@ export default function Referee({
     const [pieces, setPieces] = useState<Pieces[]>(initBoard(myTeam));
     const checkMate = useCheckmate(pieces);
     const { promotionPending, setPromotionPending, handlePromotion } =
-        usePromotion(setPieces);
+        usePromotion(setPieces, syncBoard);
 
     return (
         <>

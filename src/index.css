@@ -14,6 +14,7 @@
     grid-template-columns: repeat(8, 5vmax);
     grid-template-rows: repeat(8, 5vmax);
     position: relative;
+    user-select: none;
 }
 
 .possibleMove {
