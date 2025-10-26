@@ -18,7 +18,12 @@ export default function Board({
     checkmate,
     syncBoard,
     opponentConnected,
+    myTeam,
 }: Props) {
+    const [lastValidBoardCoords, setLastValidBoardCoords] = useState<{
+        x: number;
+        y: number;
+    } | null>(null);
     const currentTurn = useChessStore((state) => state.currentTurn);
     const setCurrentTurn = useChessStore((state) => state.setCurrentTurn);
     const boardRef = useRef<HTMLDivElement | null>(null);
@@ -50,7 +55,7 @@ export default function Board({
     useEffect(() => {
         const handleSyncBoard = (event: CustomEvent<BoardUpdateData>) => {
             const { board, currentTurn, turns } = event.detail;
-            console.log(event.detail)
+            console.log(event.detail);
             setPieces(board);
 
             useChessStore.setState({
@@ -84,8 +89,23 @@ export default function Board({
         e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>
     ) => {
         if (checkmate.isCheckmate || !opponentConnected) return;
+        const boardPos = getBoardCoordinates(e, boardRef, myTeam);
+        if (!boardPos) return;
+        const { newX, newY } = boardPos;
+        const pieceUnderCursor = pieces.find(
+            (p) => p.x === newX && p.y === newY
+        );
+        if (!pieceUnderCursor) return;
+        if (!myTeam || pieceUnderCursor.team !== myTeam) return;
+
         updateMoves();
-        draggableEvent(e, boardRef, setDraggablePiece, setActivePieceCoords);
+        draggableEvent(
+            e,
+            boardRef,
+            setDraggablePiece,
+            setActivePieceCoords,
+            myTeam
+        );
     };
 
     const movePiece = (
@@ -101,11 +121,15 @@ export default function Board({
                 ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
                 : { x: e.clientX, y: e.clientY };
 
-        const x = clientX - rect.left - draggablePiece.offsetWidth / 2;
-        const y = clientY - rect.top - draggablePiece.offsetHeight / 2;
+        const px = clientX - rect.left - draggablePiece.offsetWidth / 2;
+        const py = clientY - rect.top - draggablePiece.offsetHeight / 2;
+        draggablePiece.style.left = `${px}px`;
+        draggablePiece.style.top = `${py}px`;
 
-        draggablePiece.style.left = `${x}px`;
-        draggablePiece.style.top = `${y}px`;
+        const coords = getBoardCoordinates(e, boardRef, myTeam);
+        if (coords) {
+            setLastValidBoardCoords({ x: coords.newX, y: coords.newY });
+        }
     };
 
     const dropPiece = (
@@ -115,10 +139,16 @@ export default function Board({
 
         if (!draggablePiece || !activePieceCoords) return resetDraggablePiece();
 
-        const boardCoords = getBoardCoordinates(e, boardRef);
-        if (!boardCoords) return resetDraggablePiece();
+        const boardCoords = getBoardCoordinates(e, boardRef, myTeam);
+        const finalCoords = boardCoords
+            ? { x: boardCoords.newX, y: boardCoords.newY }
+            : lastValidBoardCoords;
 
-        const { newX, newY } = boardCoords;
+        if (!finalCoords) {
+            return resetDraggablePiece();
+        }
+
+        const { x: newX, y: newY } = finalCoords;
         const currentPiece = getCurrentPiece(activePieceCoords, pieces);
 
         if (!currentPiece || !validateTurn(currentPiece, turns))
@@ -152,9 +182,10 @@ export default function Board({
             );
         }
         resetDraggablePiece();
+        setLastValidBoardCoords(null);
     };
 
-    const boardTiles = boardTile({ pieces, activePieceCoords, turns });
+    const boardTiles = boardTile({ pieces, activePieceCoords, myTeam });
 
     return (
         <div

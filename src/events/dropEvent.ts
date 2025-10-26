@@ -3,7 +3,8 @@ import type { Pieces } from '../types';
 
 const getBoardCoordinates = (
     e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
-    boardRef: React.RefObject<HTMLDivElement | null>
+    boardRef: React.RefObject<HTMLDivElement | null>,
+    myTeam: 'WHITE' | 'BLACK' | null
 ): { newX: number; newY: number; tileSize: number } | null => {
     const rect = boardRef.current?.getBoundingClientRect();
     if (!rect) return null;
@@ -21,8 +22,17 @@ const getBoardCoordinates = (
     }
 
     const tileSize = rect.width / 8;
-    const newX = 7 - Math.floor((clientY - rect.top) / tileSize);
-    const newY = Math.floor((clientX - rect.left) / tileSize);
+    const displayX = 7 - Math.floor((clientY - rect.top) / tileSize);
+    const displayY = Math.floor((clientX - rect.left) / tileSize);
+
+    // convert display coordinates to canonical board coordinates
+    let newX = displayX;
+    let newY = displayY;
+    if (myTeam === 'BLACK') {
+        // rotate 180deg for black's perspective
+        newX = 7 - displayX;
+        newY = 7 - displayY;
+    }
 
     if (newX < 0 || newX > 7 || newY < 0 || newY > 7) return null;
 
@@ -142,7 +152,10 @@ const handleValidMove = (
         activePieceCoords.x !== newX || activePieceCoords.y !== newY;
 
     if (Array.isArray(validMove)) {
-        const newPieces = validMove.map((p) => ({ ...p, isEmpassant: false })) as Pieces[];
+        const newPieces = validMove.map((p) => ({
+            ...p,
+            isEmpassant: false,
+        })) as Pieces[];
         setPieces(newPieces);
         if (pieceMoved) {
             setTurns();

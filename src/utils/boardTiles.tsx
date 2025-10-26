@@ -17,30 +17,30 @@ interface Props {
         x: number;
         y: number;
     } | null;
-    turns: number;
+    myTeam: 'WHITE' | 'BLACK' | null;
 }
 
-const boardTile = ({ pieces, activePieceCoords, turns }: Props) => {
+const boardTile = ({ pieces, activePieceCoords, myTeam }: Props) => {
     const board = [];
     for (let x = VERTICAL_AXIS.length - 1; x >= 0; x--) {
         for (let y = 0; y < HORIZONTAL_AXIS.length; y++) {
             let image = undefined;
+            // map display coordinates (x,y) to canonical board coords
+            const boardX = myTeam === 'BLACK' ? 7 - x : x;
+            const boardY = myTeam === 'BLACK' ? 7 - y : y;
+
             const currentPiece = pieces.find(
                 (p) =>
                     p.x === activePieceCoords?.x && p.y === activePieceCoords?.y
             );
 
             let highlight = currentPiece?.possibleMoves
-                ? currentPiece.possibleMoves.some((p) => p.x === x && p.y === y)
+                ? currentPiece.possibleMoves.some(
+                      (p) => p.x === boardX && p.y === boardY
+                  )
                 : false;
 
-            if (currentPiece?.team === 'WHITE' && turns % 2 === 0)
-                highlight = false;
-
-            if (currentPiece?.team === 'BLACK' && turns % 2 === 1)
-                highlight = false;
-
-            image = pieces.find((p) => p.x === x && p.y === y)?.image;
+            image = pieces.find((p) => p.x === boardX && p.y === boardY)?.image;
 
             board.push(
                 <Tile

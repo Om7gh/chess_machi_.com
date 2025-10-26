@@ -4,7 +4,7 @@
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "vite"
+        "dev": "vite --host"
     },
     "type": "module",
     "keywords": [],
@@ -23,6 +23,7 @@
         "react-router-dom": "^7.9.1",
         "react-toastify": "^11.0.5",
         "tailwindcss": "^4.1.13",
+        "typescript": "^5.9.3",
         "vite": "^7.1.12",
         "vite-plugin-eslint": "^1.8.1",
         "zustand": "^5.0.8"

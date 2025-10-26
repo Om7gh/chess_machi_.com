@@ -1,7 +1,8 @@
 @import 'tailwindcss';
 
 .App {
-    background-image: url(../public/assets/bg1.png);
+    /* public assets are served from root /assets */
+    background-image: url('/assets/bg1.png');
     background-repeat: no-repeat;
     background-size: cover;
     height: 100vh;
@@ -21,4 +22,38 @@
     background: radial-gradient(rgb(255, 160, 255), rgb(150, 91, 238));
     border: 1px solid rgb(24, 10, 24);
     border-bottom: none;
+}
+
+:root {
+    --scroll-thumb: rgba(139, 92, 246, 0.9);
+    --scroll-track: rgba(15, 23, 42, 0.6);
+}
+
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        rgba(139, 92, 246, 0.95),
+        rgba(168, 85, 247, 0.9)
+    );
+    border-radius: 9999px;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 9999px;
+}
+
+::-webkit-scrollbar-button {
+    display: none;
 }

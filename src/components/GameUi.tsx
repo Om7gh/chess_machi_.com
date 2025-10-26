@@ -1,4 +1,3 @@
-
 import type { GameUIProps } from '../types';
 import Board from './Board';
 import CheckMate from './CheckMate';
@@ -17,7 +16,9 @@ export default function GameUI({
 }: GameUIProps) {
     return (
         <>
-            {checkMate.isCheckmate && <CheckMate winner={checkMate.winner} myTeam={myTeam} />}
+            {checkMate.isCheckmate && (
+                <CheckMate winner={checkMate.winner} myTeam={myTeam} />
+            )}
             <Board
                 pieces={pieces}
                 setPieces={setPieces}

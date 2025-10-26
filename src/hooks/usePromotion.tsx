@@ -6,17 +6,21 @@ import { useChessStore } from '../store/useChessStore';
 
 export function usePromotion(
     setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>,
-    syncBoard : (board: Pieces[], currentTurn: "WHITE" | "BLACK", turns: number) => void
+    syncBoard: (
+        board: Pieces[],
+        currentTurn: 'WHITE' | 'BLACK',
+        turns: number
+    ) => void
 ) {
     const [promotionPending, setPromotionPending] = useState<{
         piece: Pieces;
         newX: number;
         newY: number;
     } | null>(null);
-    const turns = useChessStore(state => state.turns)
-    const currentTeam = useChessStore(state => state.currentTurn)
-    const setTurns = useChessStore(state => state.setTurns)
-    const setCurrentTurn = useChessStore(state => state.setCurrentTurn)
+    const turns = useChessStore((state) => state.turns);
+    const currentTeam = useChessStore((state) => state.currentTurn);
+    const setTurns = useChessStore((state) => state.setTurns);
+    const setCurrentTurn = useChessStore((state) => state.setCurrentTurn);
 
     const handlePromotion = (promotionType: PieceType) => {
         if (!promotionPending) return;
@@ -36,7 +40,7 @@ export function usePromotion(
             let pieceImage;
             switch (promotionType) {
                 case 'QUEEN':
-                    pieceImage = isWhite ? Piece("wQ") : Piece("bQ")
+                    pieceImage = isWhite ? Piece('wQ') : Piece('bQ');
                     break;
                 case 'ROCK':
                     pieceImage = isWhite ? Piece('wR') : Piece('bR');

@@ -27,7 +27,6 @@ class ChessWebSocket {
             try {
                 const message = JSON.parse(event.data);
                 this.handleMessage(message);
-
             } catch (error) {
                 console.error('Message format is not correct:', error);
             }

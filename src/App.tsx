@@ -1,5 +1,7 @@
 import { useOnlineChess } from './hooks/useOnlineChess';
 import Referee from './components/Referee';
+import MiniChat from './components/MiniChat';
+import PlayedMoves from './components/PlayedMoves';
 
 export default function App() {
     const {
@@ -46,28 +48,38 @@ export default function App() {
                     )}
 
                     {roomId && (
-                        <div className="flex flex-col gap-2">
-                            <h3 className="text-slate-100 text-bold text-xl">
-                                <span className="text-pink-400"> Room id</span>{' '}
-                                : {roomId}
-                            </h3>
-                            <p className="text-slate-200 text-bold text-xl">
-                                <span className="text-pink-400">my Team :</span>{' '}
-                                {myTeam ? myTeam : 'waiting...'}
-                            </p>
-                            <p className="text-slate-100 text-xl">
-                                <span className="text-pink-400">
-                                    Opponent :
-                                </span>{' '}
-                                {opponentConnected
-                                    ? '✅ Connected'
-                                    : '⌛ Waiting...'}
-                            </p>
-                            <Referee
-                                myTeam={myTeam}
-                                syncBoard={syncBoard}
-                                opponentConnected={opponentConnected}
-                            />
+                        <div className="flex justify-between items-center gap-9 ">
+                            <div className="flex flex-col gap-2">
+                                <h3 className="text-slate-100 text-bold text-xl">
+                                    <span className="text-pink-400">
+                                        {' '}
+                                        Room id
+                                    </span>{' '}
+                                    : {roomId}
+                                </h3>
+                                <p className="text-slate-200 text-bold text-xl">
+                                    <span className="text-pink-400">
+                                        my Team :
+                                    </span>{' '}
+                                    {myTeam ? myTeam : 'waiting...'}
+                                </p>
+                                <p className="text-slate-100 text-xl">
+                                    <span className="text-pink-400">
+                                        Opponent :
+                                    </span>{' '}
+                                    {opponentConnected
+                                        ? '✅ Connected'
+                                        : '⌛ Waiting...'}
+                                </p>
+                                <Referee
+                                    myTeam={myTeam}
+                                    syncBoard={syncBoard}
+                                    opponentConnected={opponentConnected}
+                                />
+                            </div>
+                            <div className=" h-[40vmax] self-end flex flex-col justify-between">
+                                <PlayedMoves /> <MiniChat />
+                            </div>
                         </div>
                     )}
                 </div>

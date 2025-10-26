@@ -3,10 +3,8 @@ import { Piece, pushKnight, pushKQ, pushPishop, pushRocks } from '.';
 import type { Pieces } from '../types';
 import { PieceType, Teams } from '../types/enums';
 
-const initBoard = (myTeam: 'WHITE' | 'BLACK' | null) => {
+const initBoard = () => {
     const initBoardState: Pieces[] = [];
-
-    const position = myTeam === 'WHITE' ? 1 : 6;
 
     for (let i = 0; i < 8; i++) {
         initBoardState.push({
@@ -32,6 +30,7 @@ const initBoard = (myTeam: 'WHITE' | 'BLACK' | null) => {
     pushKnight(initBoardState);
     pushPishop(initBoardState);
     pushKQ(initBoardState);
+
     return initBoardState;
 };
 
