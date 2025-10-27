@@ -86,8 +86,8 @@ export function useOnlineChess() {
         };
     }, []);
 
-    const createRoom = () => chessSocket.createRoom();
-    const joinRoom = (roomId: string) => chessSocket.joinRoom(roomId);
+    const enterMatchmaking = () => chessSocket.matchmaking();
+    const leaveMatchmaking = () => chessSocket.leaveMatchmaking();
     const syncBoard = (
         board: Pieces[],
         currentTurn: 'WHITE' | 'BLACK',
@@ -97,8 +97,8 @@ export function useOnlineChess() {
 
     return {
         ...state,
-        createRoom,
-        joinRoom,
+        enterMatchmaking,
+        leaveMatchmaking,
         syncBoard,
         sendChat,
         isConnected: chessSocket.isConnected(),

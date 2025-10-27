@@ -1,7 +1,7 @@
 import type { Pieces } from '../types';
 
 type WebSocketMessage = {
-    type: 'create' | 'join' | 'syncBoard' | 'chat';
+    type: 'matchmaking' | 'leaveMatchmaking' | 'syncBoard' | 'chat';
     roomId?: string;
     board?: any[];
     currentTurn?: 'WHITE' | 'BLACK';
@@ -43,12 +43,8 @@ class ChessWebSocket {
         };
     }
 
-    createRoom() {
-        this.send({ type: 'create' });
-    }
-
-    joinRoom(roomId: string) {
-        this.send({ type: 'join', roomId });
+    matchmaking() {
+        this.send({ type: 'matchmaking' });
     }
 
     syncBoard(board: Pieces[], currentTurn: 'WHITE' | 'BLACK', turns: number) {
@@ -65,7 +61,7 @@ class ChessWebSocket {
     reconnect(url: string) {
         if (!this.roomId) return;
         this.connect(url);
-        this.joinRoom(this.roomId);
+        // this.joinRoom(this.roomId);
     }
 
     sendChat(text: string) {
@@ -160,6 +156,10 @@ class ChessWebSocket {
 
     isConnected(): boolean {
         return this.ws?.readyState === WebSocket.OPEN;
+    }
+
+    leaveMatchmaking() {
+        this.send({ type: 'leaveMatchmaking' });
     }
 }
 

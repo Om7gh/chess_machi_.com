@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useOnlineChess } from './hooks/useOnlineChess';
 import Referee from './components/Referee';
 import MiniChat from './components/MiniChat';
@@ -8,77 +9,83 @@ export default function App() {
         roomId,
         myTeam,
         opponentConnected,
-        createRoom,
-        joinRoom,
+        enterMatchmaking,
+        leaveMatchmaking,
         syncBoard,
     } = useOnlineChess();
+
+    const [findingMatch, setFindingMatch] = useState(false);
 
     return (
         <div className="App">
             <div className="grid place-items-center bg-slate-900/80 backdrop-blur-2xl h-screen">
                 <div>
                     {!roomId && (
-                        <div className="flex gap-8 items-center">
+                        <div className="flex flex-col items-center gap-6">
                             <button
-                                onClick={createRoom}
-                                className="px-5 py-2 rounded-xl text-xl font-bold bg-violet-500 text-slate-100"
+                                onClick={() => {
+                                    enterMatchmaking();
+                                    setFindingMatch(true);
+                                }}
+                                className="px-6 py-3 rounded-lg text-lg font-semibold bg-green-500 text-white hover:bg-green-600 transition"
                             >
-                                Create Room
+                                Find Opponent
                             </button>
-                            <p className="text-xl font-bold text-violet-500">
-                                or
-                            </p>
-                            <div className="flex  gap-5 flex-col justify-center border-4 border-violet-400 p-4 rounded-2xl">
-                                <p className="text-slate-200 text-xl">
-                                    Join Room
+                            {findingMatch && (
+                                <p className="text-yellow-400 text-lg">
+                                    Finding a match...
                                 </p>
-                                <input
-                                    className="text-xl px-4 py-2 text-slate-100 rounded-xl border-2 border-violet-400"
-                                    placeholder="Room ID"
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter')
-                                            joinRoom(
-                                                (e.target as HTMLInputElement)
-                                                    .value
-                                            );
+                            )}
+                            {findingMatch && (
+                                <button
+                                    onClick={() => {
+                                        leaveMatchmaking();
+                                        setFindingMatch(false);
                                     }}
-                                />
-                            </div>
+                                    className="px-6 py-3 rounded-lg text-lg font-semibold bg-red-500 text-white hover:bg-red-600 transition"
+                                >
+                                    Cancel Matchmaking
+                                </button>
+                            )}
                         </div>
                     )}
 
                     {roomId && (
-                        <div className="flex justify-between items-center gap-9 ">
-                            <div className="flex flex-col gap-2">
-                                <h3 className="text-slate-100 text-bold text-xl">
-                                    <span className="text-pink-400">
-                                        {' '}
-                                        Room id
-                                    </span>{' '}
-                                    : {roomId}
+                        <div className="flex items-center gap-6">
+                            <div className="text-center">
+                                <h3 className="text-2xl font-bold text-white">
+                                    Room ID:{' '}
+                                    <span className="text-yellow-400">
+                                        {roomId}
+                                    </span>
                                 </h3>
-                                <p className="text-slate-200 text-bold text-xl">
-                                    <span className="text-pink-400">
-                                        my Team :
-                                    </span>{' '}
-                                    {myTeam ? myTeam : 'waiting...'}
+                                <p className="text-lg text-gray-300">
+                                    Team:{' '}
+                                    <span className="text-blue-400">
+                                        {myTeam || 'Waiting...'}
+                                    </span>
                                 </p>
-                                <p className="text-slate-100 text-xl">
-                                    <span className="text-pink-400">
-                                        Opponent :
-                                    </span>{' '}
-                                    {opponentConnected
-                                        ? '✅ Connected'
-                                        : '⌛ Waiting...'}
+                                <p className="text-lg text-gray-300">
+                                    Opponent:{' '}
+                                    {opponentConnected ? (
+                                        <span className="text-green-400">
+                                            Connected
+                                        </span>
+                                    ) : (
+                                        <span className="text-red-400">
+                                            Waiting...
+                                        </span>
+                                    )}
                                 </p>
-                                <Referee
-                                    myTeam={myTeam}
-                                    syncBoard={syncBoard}
-                                    opponentConnected={opponentConnected}
-                                />
                             </div>
-                            <div className=" h-[40vmax] self-end flex flex-col justify-between">
-                                <PlayedMoves /> <MiniChat />
+                            <Referee
+                                myTeam={myTeam}
+                                syncBoard={syncBoard}
+                                opponentConnected={opponentConnected}
+                            />
+                            <div className="flex gap-6 w-full justify-center">
+                                <PlayedMoves />
+                                <MiniChat />
                             </div>
                         </div>
                     )}
