@@ -1,16 +1,18 @@
 export default function CheckMate({
     winner,
     myTeam,
+    onRestart,
 }: {
     winner: 'WHITE' | 'BLACK' | 'DRAW' | null;
     myTeam: 'WHITE' | 'BLACK' | null;
+    onRestart: () => void;
 }) {
     if (winner === null) return <></>;
 
     if (winner === 'DRAW') {
         return (
-            <div className="fixed top-0 left-0 right-0 bottom-0  flex justify-center items-center z-50 w-full m-auto">
-                <div className="flex flex-col gap-10 justify-center items-center bg-slate-950/40 backdrop-blur-md rounded-lg w-[25vmax] py-8">
+            <div className="fixed top-0 left-0 right-0 bottom-0  flex justify-center items-center z-999 w-full m-auto">
+                <div className="flex flex-col gap-10 justify-center items-center bg-slate-950/80 backdrop-blur-md rounded-lg w-[30vmax] py-8">
                     <p className="text-3xl font-bold text-shadow-current">
                         stalmate
                     </p>
@@ -18,7 +20,12 @@ export default function CheckMate({
                         game is: <span>{winner}</span>
                     </p>
                 </div>
-                <button>rematch</button>
+                <button
+                    className="bg-violet-400 px-4 py-2 rounded-lg text-slate-900 font-bold hover:bg-slate-900 hover:text-violet-400 transition-all duration-300"
+                    onClick={onRestart}
+                >
+                    back to menu
+                </button>
             </div>
         );
     }
@@ -40,15 +47,21 @@ export default function CheckMate({
                         className={
                             winning === 'you win'
                                 ? 'text-teal-500'
-                                : 'text-red-500'
+                                : 'text-pink-500'
                         }
                     >
                         {winning}
                     </span>
                 </p>
-                <button className="text-slate-100 bg-slate-900 px-4 py-2 rounded-lg text-xl">
-                    rematch
-                </button>
+                <div>
+                    <button
+                        className="bg-violet-400 px-4 py-2 rounded-lg text-slate-900 font-bold hover:bg-slate-900 hover:text-violet-400 transition-all duration-300"
+                        onClick={onRestart}
+                    >
+                        Restart Game
+                    </button>
+                    <button>back to menu</button>
+                </div>
             </div>
         </div>
     );

@@ -40,6 +40,9 @@ export interface CheckMateProps {
 }
 
 export interface GameUIProps {
+    setFindingMatch: React.Dispatch<React.SetStateAction<boolean>>;
+    clearRoom: () => void;
+    roomId: string | null;
     opponentConnected: boolean;
     myTeam: 'WHITE' | 'BLACK' | null;
     syncBoard: (
@@ -63,6 +66,18 @@ export interface GameUIProps {
         } | null>
     >;
     handlePromotion: (type: PieceType) => void;
+    gameOver: {
+        winner: string;
+        message: string;
+    } | null;
+    rematch: {
+        incomingOffer: boolean;
+        requested: boolean;
+        declined: boolean;
+    };
+    requestRematch: () => void;
+    acceptRematch: () => void;
+    declineRematch: () => void;
 }
 
 export type OnlineState = {

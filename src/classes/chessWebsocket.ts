@@ -1,12 +1,22 @@
 import type { Pieces } from '../types';
 
 type WebSocketMessage = {
-    type: 'matchmaking' | 'leaveMatchmaking' | 'syncBoard' | 'chat';
+    type:
+        | 'matchmaking'
+        | 'leaveMatchmaking'
+        | 'syncBoard'
+        | 'chat'
+        | 'reconnect'
+        | 'checkmate'
+        | 'rematchRequest'
+        | 'rematchAccept'
+        | 'rematchDecline';
     roomId?: string;
     board?: any[];
     currentTurn?: 'WHITE' | 'BLACK';
     turns?: number;
     text?: string;
+    winner?: 'WHITE' | 'BLACK' | 'DRAW';
 };
 
 class ChessWebSocket {
@@ -61,11 +71,15 @@ class ChessWebSocket {
     reconnect(url: string) {
         if (!this.roomId) return;
         this.connect(url);
-        // this.joinRoom(this.roomId);
+        this.send({ type: 'reconnect', roomId: this.roomId });
     }
 
     sendChat(text: string) {
         this.send({ type: 'chat', text });
+    }
+
+    announceCheckmate(winner: 'WHITE' | 'BLACK' | 'DRAW') {
+        this.send({ type: 'checkmate', winner });
     }
 
     on(event: string, handler: Function) {
@@ -134,6 +148,21 @@ class ChessWebSocket {
             case 'opponentDisconnected':
                 this.emit('opponentDisconnected');
                 break;
+            case 'gameOver':
+                this.emit('gameOver', {
+                    winner: message.winner,
+                    message: message.message,
+                });
+                break;
+            case 'rematchOffer':
+                this.emit('rematchOffer');
+                break;
+            case 'rematchPending':
+                this.emit('rematchPending');
+                break;
+            case 'rematchDeclined':
+                this.emit('rematchDeclined');
+                break;
             case 'error':
                 this.emit('error', message.message);
                 break;
@@ -160,6 +189,18 @@ class ChessWebSocket {
 
     leaveMatchmaking() {
         this.send({ type: 'leaveMatchmaking' });
+    }
+
+    requestRematch() {
+        this.send({ type: 'rematchRequest' });
+    }
+
+    acceptRematch() {
+        this.send({ type: 'rematchAccept' });
+    }
+
+    declineRematch() {
+        this.send({ type: 'rematchDecline' });
     }
 }
 

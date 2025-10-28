@@ -9,14 +9,33 @@ export default function Referee({
     myTeam,
     syncBoard,
     opponentConnected,
+    gameOver,
+    roomId,
+    clearRoom,
+    setFindingMatch,
+    rematch,
+    requestRematch,
+    acceptRematch,
+    declineRematch,
 }: {
+    setFindingMatch: React.Dispatch<React.SetStateAction<boolean>>;
     myTeam: 'WHITE' | 'BLACK' | null;
     syncBoard: (
         board: Pieces[],
         currentTurn: 'WHITE' | 'BLACK',
         turns: number
     ) => void;
+    clearRoom: () => void;
     opponentConnected: boolean;
+    gameOver: {
+        winner: string;
+        message: string;
+    } | null;
+    roomId: string | null;
+    rematch: { incomingOffer: boolean; requested: boolean; declined: boolean };
+    requestRematch: () => void;
+    acceptRematch: () => void;
+    declineRematch: () => void;
 }) {
     const [pieces, setPieces] = useState<Pieces[]>(initBoard());
     const checkMate = useCheckmate(pieces);
@@ -35,6 +54,14 @@ export default function Referee({
                 syncBoard={syncBoard}
                 myTeam={myTeam}
                 opponentConnected={opponentConnected}
+                gameOver={gameOver}
+                roomId={roomId}
+                clearRoom={clearRoom}
+                setFindingMatch={setFindingMatch}
+                rematch={rematch}
+                requestRematch={requestRematch}
+                acceptRematch={acceptRematch}
+                declineRematch={declineRematch}
             />
         </>
     );

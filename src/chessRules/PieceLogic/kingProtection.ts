@@ -39,12 +39,12 @@ const wouldKingBeInCheckAfterEnPassant = (
             if (piece.x === prevX && piece.y === prevY) {
                 return { ...piece, x: newX, y: newY };
             }
-            const capturedPawnX = prevX;
-            const capturedPawnY = newY;
+            const captupinkPawnX = prevX;
+            const captupinkPawnY = newY;
 
             if (
-                piece.x === capturedPawnX &&
-                piece.y === capturedPawnY &&
+                piece.x === captupinkPawnX &&
+                piece.y === captupinkPawnY &&
                 piece.team !== team
             ) {
                 return null;

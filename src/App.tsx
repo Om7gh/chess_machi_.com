@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useOnlineChess } from './hooks/useOnlineChess';
 import Referee from './components/Referee';
 import MiniChat from './components/MiniChat';
-import PlayedMoves from './components/PlayedMoves';
+import { ToastContainer } from 'react-toastify';
+import DevStatus from './components/DevStatus';
 
 export default function App() {
     const {
@@ -12,6 +13,13 @@ export default function App() {
         enterMatchmaking,
         leaveMatchmaking,
         syncBoard,
+        isConnected,
+        gameOver,
+        clearRoom,
+        rematch,
+        requestRematch,
+        acceptRematch,
+        declineRematch,
     } = useOnlineChess();
 
     const [findingMatch, setFindingMatch] = useState(false);
@@ -19,18 +27,27 @@ export default function App() {
     return (
         <div className="App">
             <div className="grid place-items-center bg-slate-900/80 backdrop-blur-2xl h-screen">
+                <ToastContainer />
                 <div>
-                    {!roomId && (
+                    {!isConnected && (
+                        <p className="text-pink-500 text-lg font-bold">
+                            Reconnecting to the server...
+                        </p>
+                    )}
+
+                    {!roomId && isConnected && (
                         <div className="flex flex-col items-center gap-6">
-                            <button
-                                onClick={() => {
-                                    enterMatchmaking();
-                                    setFindingMatch(true);
-                                }}
-                                className="px-6 py-3 rounded-lg text-lg font-semibold bg-green-500 text-white hover:bg-green-600 transition"
-                            >
-                                Find Opponent
-                            </button>
+                            {!findingMatch && (
+                                <button
+                                    onClick={() => {
+                                        enterMatchmaking();
+                                        setFindingMatch(true);
+                                    }}
+                                    className="px-6 py-3 rounded-lg text-lg font-semibold bg-violet-500 text-white hover:bg-violet-600 transition"
+                                >
+                                    Find Opponent
+                                </button>
+                            )}
                             {findingMatch && (
                                 <p className="text-yellow-400 text-lg">
                                     Finding a match...
@@ -42,7 +59,7 @@ export default function App() {
                                         leaveMatchmaking();
                                         setFindingMatch(false);
                                     }}
-                                    className="px-6 py-3 rounded-lg text-lg font-semibold bg-red-500 text-white hover:bg-red-600 transition"
+                                    className="px-6 py-3 rounded-lg text-lg font-semibold bg-pink-500 text-white hover:bg-pink-600 transition"
                                 >
                                     Cancel Matchmaking
                                 </button>
@@ -52,39 +69,46 @@ export default function App() {
 
                     {roomId && (
                         <div className="flex items-center gap-6">
-                            <div className="text-center">
-                                <h3 className="text-2xl font-bold text-white">
-                                    Room ID:{' '}
-                                    <span className="text-yellow-400">
-                                        {roomId}
-                                    </span>
-                                </h3>
-                                <p className="text-lg text-gray-300">
-                                    Team:{' '}
-                                    <span className="text-blue-400">
-                                        {myTeam || 'Waiting...'}
-                                    </span>
-                                </p>
-                                <p className="text-lg text-gray-300">
-                                    Opponent:{' '}
-                                    {opponentConnected ? (
-                                        <span className="text-green-400">
-                                            Connected
-                                        </span>
-                                    ) : (
-                                        <span className="text-red-400">
-                                            Waiting...
-                                        </span>
-                                    )}
-                                </p>
-                            </div>
-                            <Referee
+                            <DevStatus
                                 myTeam={myTeam}
-                                syncBoard={syncBoard}
                                 opponentConnected={opponentConnected}
+                                roomId={roomId}
                             />
-                            <div className="flex gap-6 w-full justify-center">
-                                <PlayedMoves />
+                            <div className="flex  flex-col gap-5 items-start">
+                                <div className="text-left">
+                                    <h3 className="text-2xl font-bold text-white">
+                                        Opponent ID:{' '}
+                                        <span className="text-yellow-400">
+                                            {opponentConnected
+                                                ? 'Opponent'
+                                                : 'Waiting...'}
+                                        </span>
+                                    </h3>
+                                </div>
+                                <Referee
+                                    key={roomId}
+                                    myTeam={myTeam}
+                                    syncBoard={syncBoard}
+                                    opponentConnected={opponentConnected}
+                                    gameOver={gameOver}
+                                    clearRoom={clearRoom}
+                                    roomId={roomId}
+                                    setFindingMatch={setFindingMatch}
+                                    rematch={rematch}
+                                    requestRematch={requestRematch}
+                                    acceptRematch={acceptRematch}
+                                    declineRematch={declineRematch}
+                                />
+                                <div className="text-left">
+                                    <h3 className="text-2xl font-bold text-white">
+                                        Your ID:{' '}
+                                        <span className="text-blue-400">
+                                            {roomId}
+                                        </span>
+                                    </h3>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-6 w-full justify-center">
                                 <MiniChat />
                             </div>
                         </div>
