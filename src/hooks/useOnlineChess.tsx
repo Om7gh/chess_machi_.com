@@ -18,8 +18,7 @@ interface OnlineState {
 }
 
 export function useOnlineChess() {
-    // Suppress stale gameOver messages while matchmaking between games
-    const suppressGameOverRef = { current: false } as { current: boolean };
+    const gameOverRef = { current: false } as { current: boolean };
     const [state, setState] = useState<OnlineState>({
         roomId: null,
         myTeam: null,
@@ -29,7 +28,14 @@ export function useOnlineChess() {
     });
 
     useEffect(() => {
-        chessSocket.connect('ws://localhost:9000/game/chess');
+        const urlParams = new URLSearchParams(window.location.search);
+        const pid =
+            urlParams.get('playerId') || localStorage.getItem('playerId');
+        const baseWs = `ws://10.12.8.9:9000/game/chess`;
+        const wsUrl = pid
+            ? `${baseWs}?playerId=${encodeURIComponent(pid)}`
+            : baseWs;
+        chessSocket.connect(wsUrl);
 
         chessSocket.on('connected', () => {
             console.log('✅ Connected to server');
@@ -59,7 +65,7 @@ export function useOnlineChess() {
                 });
                 // Reset global turn state for a new game
                 useChessStore.setState({ currentTurn: 'WHITE', turns: 1 });
-                suppressGameOverRef.current = false;
+                gameOverRef.current = false;
             }
         );
 
@@ -91,7 +97,7 @@ export function useOnlineChess() {
                 }));
                 // Ensure turns reset at the start of every new game
                 useChessStore.setState({ currentTurn: 'WHITE', turns: 1 });
-                suppressGameOverRef.current = false;
+                gameOverRef.current = false;
             }
         );
 
@@ -137,7 +143,21 @@ export function useOnlineChess() {
             setState((prev) => ({ ...prev }));
 
             setTimeout(() => {
-                chessSocket.reconnect('ws://localhost:9000/game/chess');
+                const urlParams = new URLSearchParams(window.location.search);
+                const pid =
+                    urlParams.get('playerId') ||
+                    localStorage.getItem('playerId');
+                const wsHost =
+                    (import.meta as any).env?.VITE_WS_HOST ||
+                    window.location.hostname;
+                const wsPort = (import.meta as any).env?.VITE_WS_PORT || '9000';
+                const wsProto =
+                    window.location.protocol === 'https:' ? 'wss' : 'ws';
+                const baseWs = `${wsProto}://${wsHost}:${wsPort}/game/chess`;
+                const wsUrl = pid
+                    ? `${baseWs}?playerId=${encodeURIComponent(pid)}`
+                    : baseWs;
+                chessSocket.reconnect(wsUrl);
             }, 1000);
         });
 
@@ -148,7 +168,7 @@ export function useOnlineChess() {
         chessSocket.on(
             'gameOver',
             ({ winner, message }: { winner: string; message: string }) => {
-                if (suppressGameOverRef.current) {
+                if (gameOverRef.current) {
                     console.log(
                         'Suppressing stale gameOver during matchmaking'
                     );
@@ -184,7 +204,7 @@ export function useOnlineChess() {
                 };
                 return newState;
             });
-            suppressGameOverRef.current = true;
+            gameOverRef.current = true;
         });
 
         chessSocket.on('rematchOffer', () => {

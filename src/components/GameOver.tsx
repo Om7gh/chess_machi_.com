@@ -22,7 +22,7 @@ const GameOver = ({
 
     return (
         <div className="fixed top-0 left-0 right-0 bottom-0  flex justify-center items-center z-999 w-full text-center m-auto">
-            <div className="flex flex-col gap-10 justify-center items-center bg-slate-950/80 backdrop-blur-md rounded-lg w-[30vmax] py-8">
+            <div className="flex flex-col gap-10 justify-center items-center bg-slate-950/80 backdrop-blur-md rounded-lg w-[20vmax] py-8">
                 <h2 className="text-slate-100 text-xl">{getMessage()}</h2>
                 <div className="flex flex-col gap-3 w-full px-6">
                     {rematch.incomingOffer ? (

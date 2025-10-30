@@ -99,8 +99,8 @@ export default function App() {
                                     acceptRematch={acceptRematch}
                                     declineRematch={declineRematch}
                                 />
-                                <div className="text-left">
-                                    <h3 className="text-2xl font-bold text-white">
+                                <div className="text-left bg-slate-900 px-5 py-5 rounded-xl flex justify-between w-full text-slate-100">
+                                    <h3 className="text-2xl font-bold text-slate-100">
                                         Your ID:{' '}
                                         <span className="text-blue-400">
                                             {roomId}

@@ -1,6 +1,12 @@
 import type { Pieces } from '../../types';
 import { isCellAccessible } from '../utills';
-import { isKingInCheck } from './kingProtection';
+import { pawnCheck } from './kingProtection';
+import { getBishopPossibleMoves } from '../PossibleMoves/bishopPossibleMoves';
+import { getKingPossibleMoves } from '../PossibleMoves/kingPossibleMoves';
+import { getKnightPossibleMoves } from '../PossibleMoves/knightPossibleMoves';
+import { getPawnPossibleMoves } from '../PossibleMoves/pawnPossibleMoves';
+import { getQueenPossibleMoves } from '../PossibleMoves/queenPossibleMoves';
+import { getRockPossibleMoves } from '../PossibleMoves/rockPossibleMoves';
 
 const castleLogic = (
     prevX: number,
@@ -24,11 +30,18 @@ const castleLogic = (
         return { isValid: false };
     }
 
+    if (prevX !== newX) {
+        return { isValid: false };
+    }
+
     if (kingPiece.isKingMoving || rookPiece.isRookMoving) {
         return { isValid: false };
     }
 
     const distance = Math.abs(newY - prevY);
+    if (distance !== 3 && distance !== 4) {
+        return { isValid: false };
+    }
     const yDirection = newY > prevY ? 1 : -1;
 
     for (let i = 1; i < distance; i++) {
@@ -38,13 +51,52 @@ const castleLogic = (
         }
     }
 
-    if (isKingInCheck(kingPiece.team, board, kingPiece.x, kingPiece.y)) {
+    const isSquareAttacked = (
+        x: number,
+        y: number,
+        byTeam: 'WHITE' | 'BLACK'
+    ) => {
+        for (const piece of board) {
+            if (piece.team !== byTeam) continue;
+            if (piece.type === 'PAWN') {
+                if (pawnCheck(piece, x, y)) return true;
+                continue;
+            }
+            let moves;
+            switch (piece.type) {
+                case 'KING':
+                    moves = getKingPossibleMoves(piece, board);
+                    break;
+                case 'KNIGHT':
+                    moves = getKnightPossibleMoves(piece, board);
+                    break;
+                case 'QUEEN':
+                    moves = getQueenPossibleMoves(piece, board);
+                    break;
+                case 'BISHOP':
+                    moves = getBishopPossibleMoves(piece, board);
+                    break;
+                case 'ROCK':
+                    moves = getRockPossibleMoves(piece, board);
+                    break;
+                default:
+                    moves = getPawnPossibleMoves(piece, board);
+            }
+            for (const m of moves) {
+                if (m.x === x && m.y === y) return true;
+            }
+        }
+        return false;
+    };
+
+    const opponentTeam = kingPiece.team === 'WHITE' ? 'BLACK' : 'WHITE';
+    if (isSquareAttacked(kingPiece.x, kingPiece.y, opponentTeam)) {
         return { isValid: false };
     }
 
     for (let i = 1; i <= 2; i++) {
         const checkY = prevY + i * yDirection;
-        if (isKingInCheck(kingPiece.team, board, prevX, checkY)) {
+        if (isSquareAttacked(prevX, checkY, opponentTeam)) {
             return { isValid: false };
         }
     }

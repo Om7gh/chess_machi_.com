@@ -40,6 +40,7 @@ export default function GameUI({
             sentCheckmateRef.current = false;
         }
     }, [checkMate.isCheckmate, checkMate.winner]);
+
     const onRestart = () => {
         setPieces(initBoard());
         setPromotionPending(null);

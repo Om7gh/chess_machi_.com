@@ -1,12 +1,18 @@
 import type { Pieces } from '../../types';
 import type { Teams } from '../../types/enums';
-import { isKingInCheck } from './kingProtection';
+import {
+    isKingInCheckWithUpdatedMoves,
+    updatePossibleMoves,
+} from './kingProtection';
 import { ChessRules } from '../../classes/chessRules';
 
 const isCheckMate = (board: Pieces[], team: Teams): boolean => {
     const king = board.find((p) => p.type === 'KING' && p.team === team);
     if (!king) return false;
-    if (!isKingInCheck(king.team, board, king.x, king.y)) return false;
+
+    const boardWithUpdatedMoves = updatePossibleMoves(board);
+    if (!isKingInCheckWithUpdatedMoves(team, boardWithUpdatedMoves))
+        return false;
 
     const rules = new ChessRules();
     const army = board.filter((p) => p.team === team);

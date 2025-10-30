@@ -25,11 +25,9 @@ const getBoardCoordinates = (
     const displayX = 7 - Math.floor((clientY - rect.top) / tileSize);
     const displayY = Math.floor((clientX - rect.left) / tileSize);
 
-    // convert display coordinates to canonical board coordinates
     let newX = displayX;
     let newY = displayY;
     if (myTeam === 'BLACK') {
-        // rotate 180deg for black's perspective
         newX = 7 - displayX;
         newY = 7 - displayY;
     }
@@ -85,6 +83,13 @@ const updatePiecesForMove = (
     return resetEnPassantPieces
         .map((p) => {
             if (p.x === activePieceCoords.x && p.y === activePieceCoords.y) {
+                // Mark king/rook as having moved for future castling checks
+                const movedFlags =
+                    p.type === 'KING'
+                        ? { isKingMoving: true }
+                        : p.type === 'ROCK'
+                        ? { isRookMoving: true }
+                        : {};
                 if (
                     Math.abs(activePieceCoords.x - newX) === 2 &&
                     p.type === 'PAWN'
@@ -94,6 +99,7 @@ const updatePiecesForMove = (
                         x: newX,
                         y: newY,
                         isEmpassant: true,
+                        ...movedFlags,
                     };
                 } else {
                     return {
@@ -101,6 +107,7 @@ const updatePiecesForMove = (
                         x: newX,
                         y: newY,
                         isEmpassant: false,
+                        ...movedFlags,
                     };
                 }
             }
