@@ -9,58 +9,49 @@ export default function CheckMate({
 }) {
     if (winner === null) return <></>;
 
-    if (winner === 'DRAW') {
-        return (
-            <div className="fixed top-0 left-0 right-0 bottom-0  flex justify-center items-center z-999 w-full m-auto">
-                <div className="flex flex-col gap-10 justify-center items-center bg-slate-950/80 backdrop-blur-md rounded-lg w-[20vmax] py-8 text-slate-100">
-                    <p className="text-3xl font-bold text-shadow-current">
-                        stalmate
-                    </p>
-                    <p className="text-3xl font-bold text-shadow-current">
-                        game is: <span>{winner}</span>
-                    </p>
-                </div>
-                <button
-                    className="bg-violet-400 px-4 py-2 rounded-lg text-slate-900 font-bold hover:bg-slate-900 hover:text-violet-400 transition-all duration-300"
-                    onClick={onRestart}
-                >
-                    back to menu
-                </button>
-            </div>
-        );
-    }
-
     const winning =
         winner === 'WHITE' && myTeam === 'WHITE'
             ? 'you win'
             : winner === 'BLACK' && myTeam === 'BLACK'
             ? 'you win'
             : 'you lose';
+
+    const isDraw = winner === 'DRAW';
+
     return (
-        <div className="fixed top-0 left-0 right-0 bottom-0  flex justify-center items-center z-9999 w-full m-auto">
-            <div className="flex flex-col gap-10 justify-center items-center bg-slate-950/40 backdrop-blur-md rounded-lg w-[20vmax] py-8 text-center">
-                <p className="text-3xl font-bold text-shadow-current">
-                    <p className="text-3xl font-bold text-shadow-current text-slate-100">
-                        Checkmate
-                    </p>
-                    <span
-                        className={
-                            winning === 'you win'
-                                ? 'text-teal-500'
-                                : 'text-pink-500'
-                        }
-                    >
-                        {winning}
-                    </span>
+        <div className="fixed inset-0 flex justify-center items-center z-[9999] bg-black/60 backdrop-blur-md">
+            <div className="relative flex flex-col items-center gap-6 bg-slate-950/70 rounded-2xl shadow-2xl w-[25vmax] py-10 px-6 text-center border border-violet-400/20 animate-fadeIn">
+                <h1 className="text-4xl font-extrabold text-slate-100 drop-shadow-lg">
+                    {isDraw ? 'Stalemate' : 'Checkmate'}
+                </h1>
+
+                <p
+                    className={`text-2xl font-semibold ${
+                        isDraw
+                            ? 'text-slate-300'
+                            : winning === 'you win'
+                            ? 'text-teal-400'
+                            : 'text-pink-400'
+                    } transition-colors duration-300`}
+                >
+                    {isDraw ? 'Game is a draw' : winning}
                 </p>
-                <div>
+
+                <div className="w-2/3 h-[1px] bg-slate-700 my-2"></div>
+
+                <div className="flex gap-4 mt-4">
                     <button
-                        className="bg-violet-400 px-4 py-2 rounded-lg text-slate-900 font-bold hover:bg-slate-900 hover:text-violet-400 transition-all duration-300"
                         onClick={onRestart}
+                        className="bg-violet-400 text-slate-900 font-bold px-5 py-2 rounded-lg shadow-md hover:bg-slate-900 hover:text-violet-400 transition-all duration-300 transform hover:scale-105"
                     >
                         Restart Game
                     </button>
-                    <button>back to menu</button>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="bg-transparent border border-violet-400/50 text-violet-400 px-5 py-2 rounded-lg hover:bg-violet-400 hover:text-slate-900 transition-all duration-300 transform hover:scale-105"
+                    >
+                        Back to Menu
+                    </button>
                 </div>
             </div>
         </div>

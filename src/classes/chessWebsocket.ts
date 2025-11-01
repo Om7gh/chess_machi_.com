@@ -1,4 +1,4 @@
-import type { Pieces } from '../types';
+import type { Pieces, Position } from '../types';
 
 type WebSocketMessage = {
     type:
@@ -11,6 +11,8 @@ type WebSocketMessage = {
         | 'rematchRequest'
         | 'rematchAccept'
         | 'rematchDecline';
+    // prevMove carries both origin and destination so clients can highlight both squares
+    prevMove?: { from: Position; to: Position } | null;
     roomId?: string;
     board?: any[];
     currentTurn?: 'WHITE' | 'BLACK';
@@ -57,13 +59,19 @@ class ChessWebSocket {
         this.send({ type: 'matchmaking' });
     }
 
-    syncBoard(board: Pieces[], currentTurn: 'WHITE' | 'BLACK', turns: number) {
+    syncBoard(
+        board: Pieces[],
+        currentTurn: 'WHITE' | 'BLACK',
+        turns: number,
+        prevMove: { from: Position; to: Position } | null
+    ) {
         if (this.roomId) {
             this.send({
                 type: 'syncBoard',
                 board,
                 currentTurn,
                 turns,
+                prevMove,
             });
         }
     }
@@ -136,6 +144,7 @@ class ChessWebSocket {
                     currentTurn: message.currentTurn,
                     turns: message.turns,
                     fromPlayer: message.fromPlayer,
+                    prevMove: message.prevMove,
                 });
                 break;
             case 'chatMessage':

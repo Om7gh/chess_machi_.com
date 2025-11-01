@@ -24,6 +24,21 @@
     border-bottom: none;
 }
 
+.prevMove {
+    background: radial-gradient(
+        rgb(255, 160, 255, 0.6),
+        rgb(150, 91, 238, 0.6)
+    );
+    border: 1px solid rgb(59, 15, 59);
+    border-bottom: none;
+}
+
+.kingInCheck {
+    background: radial-gradient(rgba(213, 6, 65, 0.6), rgba(240, 93, 93, 0.6));
+    border: 1px solid rgb(198, 36, 36);
+    border-bottom: none;
+}
+
 :root {
     --scroll-thumb: rgba(139, 92, 246, 0.9);
     --scroll-track: rgba(15, 23, 42, 0.6);

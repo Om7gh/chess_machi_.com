@@ -1,4 +1,4 @@
-import type { BoardUpdateData, Props } from '../types';
+import type { BoardUpdateData, Position, Props } from '../types';
 import { useEffect, useRef, useState } from 'react';
 import { ChessRules } from '../classes/chessRules';
 import { boardTile } from '../utils/boardTiles';
@@ -37,6 +37,7 @@ export default function Board({
     const turns = useChessStore((state) => state.turns);
     const setTurns = useChessStore((state) => state.setTurns);
     const rules = new ChessRules();
+    const prevMove = useChessStore((state) => state.prevMove);
 
     const resetDraggablePiece = () => {
         if (draggablePiece) {
@@ -54,13 +55,30 @@ export default function Board({
 
     useEffect(() => {
         const handleSyncBoard = (event: CustomEvent<BoardUpdateData>) => {
-            const { board, currentTurn, turns } = event.detail;
-            console.log(event.detail);
+            const { board, currentTurn, turns, prevMove } =
+                event.detail as BoardUpdateData & { prevMove?: Position };
             setPieces(board);
+
+            let normalizedPrev: { from: Position; to: Position } | null = null;
+            if (prevMove) {
+                // already has from/to
+                if ((prevMove as any).from && (prevMove as any).to) {
+                    normalizedPrev = prevMove as {
+                        from: Position;
+                        to: Position;
+                    };
+                } else if ((prevMove as any).x !== undefined) {
+                    normalizedPrev = {
+                        from: prevMove as Position,
+                        to: prevMove as Position,
+                    };
+                }
+            }
 
             useChessStore.setState({
                 currentTurn,
                 turns,
+                prevMove: normalizedPrev ?? useChessStore.getState().prevMove,
             });
         };
         window.addEventListener('syncBoard', handleSyncBoard as EventListener);
@@ -178,14 +196,20 @@ export default function Board({
                 syncBoard,
                 setCurrentTurn,
                 currentTurn,
-                turns
+                turns,
+                activePieceCoords
             );
         }
         resetDraggablePiece();
         setLastValidBoardCoords(null);
     };
 
-    const boardTiles = boardTile({ pieces, activePieceCoords, myTeam });
+    const boardTiles = boardTile({
+        pieces,
+        activePieceCoords,
+        myTeam,
+        prevMove,
+    });
 
     return (
         <div

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { chessSocket } from '../classes/chessWebsocket';
 import { useChessStore } from '../store/useChessStore';
 import { toast } from 'react-toastify';
-import type { ChatMessageData, Pieces } from '../types';
+import type { ChatMessageData, Pieces, Position } from '../types';
 import type { BoardUpdateData } from '../types';
 
 interface OnlineState {
@@ -31,7 +31,7 @@ export function useOnlineChess() {
         const urlParams = new URLSearchParams(window.location.search);
         const pid =
             urlParams.get('playerId') || localStorage.getItem('playerId');
-        const baseWs = `ws://10.12.8.9:9000/game/chess`;
+        const baseWs = ` ws://10.12.8.15:9000/game/chess`;
         const wsUrl = pid
             ? `${baseWs}?playerId=${encodeURIComponent(pid)}`
             : baseWs;
@@ -51,7 +51,6 @@ export function useOnlineChess() {
                 roomId: string | null;
                 myTeam: 'WHITE' | 'BLACK' | null;
             }) => {
-                // Reset online state for a fresh game session
                 setState({
                     roomId,
                     myTeam,
@@ -63,9 +62,9 @@ export function useOnlineChess() {
                         declined: false,
                     },
                 });
-                // Reset global turn state for a new game
                 useChessStore.setState({ currentTurn: 'WHITE', turns: 1 });
                 gameOverRef.current = false;
+                useChessStore.setState({ prevMove: null });
             }
         );
 
@@ -76,7 +75,7 @@ export function useOnlineChess() {
                 opponentConnected,
                 roomId,
             }: {
-                myTeam: 'WHITE' | 'BLACK' | 'DRAW' | null; // tolerate variations
+                myTeam: 'WHITE' | 'BLACK' | 'DRAW' | null;
                 opponentConnected: boolean;
                 roomId: string;
             }) => {
@@ -95,9 +94,9 @@ export function useOnlineChess() {
                         declined: false,
                     },
                 }));
-                // Ensure turns reset at the start of every new game
                 useChessStore.setState({ currentTurn: 'WHITE', turns: 1 });
                 gameOverRef.current = false;
+                useChessStore.setState({ prevMove: null });
             }
         );
 
@@ -116,7 +115,7 @@ export function useOnlineChess() {
         chessSocket.on('opponentDisconnected', () => {
             setState((prev) => ({ ...prev, opponentConnected: false }));
             toast.error('Opponent disconnected', {
-                position: 'top-right',
+                position: 'top-center',
                 autoClose: 5000,
                 hideProgressBar: false,
                 closeOnClick: true,
@@ -130,7 +129,7 @@ export function useOnlineChess() {
             toast.warn(
                 'You have been disconnected. Attempting to reconnect...',
                 {
-                    position: 'top-right',
+                    position: 'top-center',
                     autoClose: 5000,
                     hideProgressBar: false,
                     closeOnClick: true,
@@ -179,7 +178,7 @@ export function useOnlineChess() {
                     gameOver: { winner, message },
                 }));
                 toast.info(`Game Over! ${message}`, {
-                    position: 'top-right',
+                    position: 'top-center',
                     autoClose: 5000,
                     hideProgressBar: false,
                     closeOnClick: true,
@@ -262,11 +261,14 @@ export function useOnlineChess() {
     const syncBoard = (
         board: Pieces[],
         currentTurn: 'WHITE' | 'BLACK',
-        turns: number
-    ) => chessSocket.syncBoard(board, currentTurn, turns);
+        turns: number,
+        prevMove: { from: Position; to: Position } | null
+    ) => {
+        useChessStore.setState({ prevMove: prevMove });
+        chessSocket.syncBoard(board, currentTurn, turns, prevMove);
+    };
     const sendChat = (text: string) => chessSocket.sendChat(text);
     const requestRematch = () => {
-        // optimistic UI update
         setState((prev) => ({
             ...prev,
             rematch: { incomingOffer: false, requested: true, declined: false },
@@ -289,14 +291,12 @@ export function useOnlineChess() {
     };
 
     const clearRoom = () => {
-        // Clear current room and reset online/gameOver state
         setState((prev) => ({
             ...prev,
             roomId: null,
             gameOver: null,
             opponentConnected: false,
         }));
-        // Also reset global turn state so next match starts clean
         useChessStore.setState({ currentTurn: 'WHITE', turns: 1 });
     };
 
@@ -306,11 +306,11 @@ export function useOnlineChess() {
         leaveMatchmaking,
         syncBoard,
         sendChat,
-        isConnected: chessSocket.isConnected(),
         clearRoom,
-        rematch: state.rematch,
         requestRematch,
         acceptRematch,
         declineRematch,
+        rematch: state.rematch,
+        isConnected: chessSocket.isConnected(),
     };
 }

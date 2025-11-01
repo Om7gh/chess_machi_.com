@@ -16,6 +16,7 @@ export interface Pieces {
     isRookMoving?: boolean | undefined;
     possibleMoves?: Position[] | undefined;
     isCheckMate?: boolean | undefined;
+    isKingInCheck?: boolean | undefined;
 }
 
 export interface Props {
@@ -24,7 +25,8 @@ export interface Props {
     syncBoard: (
         board: Pieces[],
         currentTurn: 'WHITE' | 'BLACK',
-        turns: number
+        turns: number,
+        prevMove?: { from: Position; to: Position } | null
     ) => void;
     checkmate: CheckMateProps;
     pieces: Pieces[];
@@ -48,7 +50,8 @@ export interface GameUIProps {
     syncBoard: (
         board: Pieces[],
         currentTurn: 'WHITE' | 'BLACK',
-        turns: number
+        turns: number,
+        prevMove?: { from: Position; to: Position } | null
     ) => void;
     pieces: Pieces[];
     setPieces: React.Dispatch<React.SetStateAction<Pieces[]>>;
@@ -91,6 +94,7 @@ export type BoardUpdateData = {
     currentTurn: 'WHITE' | 'BLACK';
     turns: number;
     fromPlayer: 'WHITE' | 'BLACK';
+    prevMove: { from: Position; to: Position } | null;
 };
 
 export type ChatMessageData = {

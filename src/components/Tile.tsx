@@ -5,11 +5,15 @@ export default function Tile({
     rank,
     piece,
     highlight,
+    prevMoveHighlight,
+    highlightKingInCheck,
 }: {
     file: number;
     rank: number;
     piece: string | undefined;
     highlight: boolean;
+    prevMoveHighlight: boolean;
+    highlightKingInCheck: boolean | undefined;
 }) {
     const isLight = (rank + file) % 2 === 1;
     const tileId = `${HORIZONTAL_AXIS[file]}${VERTICAL_AXIS[rank]}`;
@@ -24,7 +28,14 @@ export default function Tile({
             key={tileId}
             className={`${baseStyles} ${
                 isLight ? lightTileStyle : darkTileStyle
-            } ${highlight ? 'possibleMove' : null}`}
+            } ${highlight ? 'possibleMove' : null}
+            ${prevMoveHighlight ? 'prevMove' : null}
+            ${
+                highlightKingInCheck
+                    ? 'kingInCheck'
+                    : null
+            }
+            `}
         >
             {piece && (
                 <div

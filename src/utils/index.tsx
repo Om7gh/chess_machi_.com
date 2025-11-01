@@ -128,6 +128,7 @@ export const pushKQ = (piece: Pieces[]) => {
         isRookMoving: false,
         isKingMoving: false,
         isCheckMate: false,
+        isKingInCheck: false,
     });
     piece.push({
         image: Piece('bQ'),
@@ -145,5 +146,6 @@ export const pushKQ = (piece: Pieces[]) => {
         isRookMoving: false,
         isKingMoving: false,
         isCheckMate: false,
+        isKingInCheck: false,
     });
 };

@@ -1,5 +1,5 @@
 import { enPassant } from '../chessRules/PieceLogic/enPassant';
-import type { Pieces } from '../types';
+import type { Pieces, Position } from '../types';
 
 const getBoardCoordinates = (
     e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>,
@@ -83,7 +83,6 @@ const updatePiecesForMove = (
     return resetEnPassantPieces
         .map((p) => {
             if (p.x === activePieceCoords.x && p.y === activePieceCoords.y) {
-                // Mark king/rook as having moved for future castling checks
                 const movedFlags =
                     p.type === 'KING'
                         ? { isKingMoving: true }
@@ -149,11 +148,14 @@ const handleValidMove = (
     syncBoard: (
         board: Pieces[],
         currentTurn: 'WHITE' | 'BLACK',
-        turns: number
+        turns: number,
+        prevMove: { from: Position; to: Position } | null
     ) => void,
     setCurrentTurn: () => void,
     currentTurn: 'WHITE' | 'BLACK',
-    turns: number
+    turns: number,
+    // prevMove param is not used here; origin/destination are constructed inside the handler
+    _prevMove: Position
 ): void => {
     const pieceMoved =
         activePieceCoords.x !== newX || activePieceCoords.y !== newY;
@@ -167,7 +169,11 @@ const handleValidMove = (
         if (pieceMoved) {
             setTurns();
             setCurrentTurn();
-            syncBoard(newPieces, currentTurn, turns + 1);
+            // send both from (origin) and to (destination) so UI can highlight both
+            syncBoard(newPieces, currentTurn, turns + 1, {
+                from: activePieceCoords,
+                to: { x: newX, y: newY },
+            });
         }
     } else if (validMove === true) {
         if (isPromotionMove(currentPiece, newX)) {
@@ -200,7 +206,11 @@ const handleValidMove = (
             if (pieceMoved) {
                 setTurns();
                 setCurrentTurn();
-                syncBoard(newPieces, currentTurn, turns + 1);
+                // send both from (origin) and to (destination) so UI can highlight both
+                syncBoard(newPieces, currentTurn, turns + 1, {
+                    from: activePieceCoords,
+                    to: { x: newX, y: newY },
+                });
             }
         }
     }

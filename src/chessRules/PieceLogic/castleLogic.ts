@@ -18,33 +18,39 @@ const castleLogic = (
     const kingPiece = board.find(
         (p) => p.x === prevX && p.y === prevY && p.type === 'KING'
     );
-    const rookPiece = board.find(
+
+    if (!kingPiece) return { isValid: false };
+
+    let rookPiece = board.find(
         (p) => p.x === newX && p.y === newY && p.type === 'ROCK'
     );
 
-    if (!kingPiece || !rookPiece) {
-        return { isValid: false };
+    let yDirection = newY > prevY ? 1 : -1;
+    let clickDistance = Math.abs(newY - prevY);
+
+    if (!rookPiece) {
+        if (clickDistance === 2) {
+            const candidateRookY = yDirection === 1 ? prevY + 3 : prevY - 4;
+            rookPiece = board.find(
+                (p) =>
+                    p.x === newX && p.y === candidateRookY && p.type === 'ROCK'
+            );
+
+            if (!rookPiece) return { isValid: false };
+        } else {
+            return { isValid: false };
+        }
     }
 
-    if (kingPiece.team !== rookPiece.team) {
+    if (kingPiece.team !== rookPiece.team) return { isValid: false };
+    if (prevX !== newX) return { isValid: false };
+    if (kingPiece.isKingMoving || rookPiece.isRookMoving)
         return { isValid: false };
-    }
 
-    if (prevX !== newX) {
-        return { isValid: false };
-    }
-
-    if (kingPiece.isKingMoving || rookPiece.isRookMoving) {
-        return { isValid: false };
-    }
-
-    const distance = Math.abs(newY - prevY);
-    if (distance !== 3 && distance !== 4) {
-        return { isValid: false };
-    }
-    const yDirection = newY > prevY ? 1 : -1;
-
-    for (let i = 1; i < distance; i++) {
+    const distanceToRook = Math.abs(rookPiece.y - prevY);
+    if (distanceToRook !== 3 && distanceToRook !== 4) return { isValid: false };
+    yDirection = rookPiece.y > prevY ? 1 : -1;
+    for (let i = 1; i < distanceToRook; i++) {
         const checkY = prevY + i * yDirection;
         if (!isCellAccessible(prevX, checkY, board)) {
             return { isValid: false };
@@ -101,6 +107,7 @@ const castleLogic = (
         }
     }
 
+    const rookY = rookPiece.y;
     const updatedBoard = board.map((piece) => {
         if (piece.x === prevX && piece.y === prevY && piece.type === 'KING') {
             const kingNewY = prevY + 2 * yDirection;
@@ -112,7 +119,11 @@ const castleLogic = (
             };
         }
 
-        if (piece.x === newX && piece.y === newY && piece.type === 'ROCK') {
+        if (
+            piece.x === rookPiece.x &&
+            piece.y === rookY &&
+            piece.type === 'ROCK'
+        ) {
             const rookNewY = prevY + 1 * yDirection;
             return {
                 ...piece,

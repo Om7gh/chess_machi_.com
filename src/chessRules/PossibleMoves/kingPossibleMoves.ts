@@ -63,6 +63,8 @@ export const getKingPossibleMoves = (
                 }
             }
             if (pathClear && isCellAccessible(king.x, king.y + 2, board)) {
+                // allow clicking either the king destination (y+2) or the rook square (y+3)
+                kingPossibleMoves.push({ x: king.x, y: king.y + 2 });
                 kingPossibleMoves.push({ x: king.x, y: king.y + 3 });
             }
         }
@@ -81,6 +83,8 @@ export const getKingPossibleMoves = (
                 }
             }
             if (pathClear && isCellAccessible(king.x, king.y - 2, board)) {
+                // allow clicking either the king destination (y-2) or the rook square (y-4)
+                kingPossibleMoves.push({ x: king.x, y: king.y - 2 });
                 kingPossibleMoves.push({ x: king.x, y: king.y - 4 });
             }
         }
